@@ -289,6 +289,50 @@
             <span>New Project</span>
           </button>
         </div>
+        
+        <!-- Projects Filter Panel -->
+        <div class="glass-card rounded-2xl p-6 mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-filter text-indigo-600"></i>
+            Filter Projects
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="projectSearchInput" placeholder="Search by name or description..." 
+                       class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-300 focus:border-transparent">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+              <select id="projectDateFilter" class="w-full px-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-300">
+                <option value="all">All Time</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </div>
+            <div class="flex items-end gap-2">
+              <button id="clearProjectFilters" class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all font-medium">
+                <i class="fas fa-times mr-2"></i>Clear
+              </button>
+            </div>
+          </div>
+          <div id="customProjectDateRange" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+              <input type="date" id="projectFromDate" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-300">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+              <input type="date" id="projectToDate" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-300">
+            </div>
+          </div>
+        </div>
+        
         <div id="projectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </section>
 
@@ -308,6 +352,50 @@
             <span>New Task</span>
           </button>
         </div>
+        
+        <!-- Tasks Filter Panel -->
+        <div class="glass-card rounded-2xl p-6 mb-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-filter text-purple-600"></i>
+            Filter Tasks
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="taskSearchInput" placeholder="Search by title or description..." 
+                       class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent">
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Deadline Filter</label>
+              <select id="taskDateFilter" class="w-full px-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300">
+                <option value="today">Today's Deadlines</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="all">All Tasks</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </div>
+            <div class="flex items-end gap-2">
+              <button id="clearTaskFilters" class="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all font-medium">
+                <i class="fas fa-times mr-2"></i>Clear
+              </button>
+            </div>
+          </div>
+          <div id="customTaskDateRange" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+              <input type="date" id="taskFromDate" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-300">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+              <input type="date" id="taskToDate" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-300">
+            </div>
+          </div>
+        </div>
+        
         <div id="tasksList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </section>
 
@@ -1394,16 +1482,95 @@
         }
       };
 
+      // Projects filtering
+      let allProjects = [];
+      let filteredProjects = [];
+
       async function loadProjects() {
-        const list = document.getElementById('projectsList');
-        list.innerHTML = '';
         const snap = await db.collection('projects').orderBy('createdAt', 'desc').get();
-        if (snap.empty) {
-          list.innerHTML = '<div class="text-gray-500 text-center py-4 col-span-3">No projects yet.</div>';
-          return;
-        }
+        allProjects = [];
         snap.forEach(doc => {
           const p = doc.data();
+          allProjects.push({
+            id: doc.id,
+            ...p,
+            createdAt: p.createdAt?.toDate() || new Date()
+          });
+        });
+        applyProjectFilters();
+      }
+
+      function applyProjectFilters() {
+        const searchTerm = document.getElementById('projectSearchInput')?.value.toLowerCase() || '';
+        const dateFilter = document.getElementById('projectDateFilter')?.value || 'all';
+
+        filteredProjects = allProjects.filter(project => {
+          const matchesSearch = !searchTerm || 
+            project.name?.toLowerCase().includes(searchTerm) ||
+            project.desc?.toLowerCase().includes(searchTerm);
+          
+          const matchesDate = applyProjectDateFilter(project, dateFilter);
+          
+          return matchesSearch && matchesDate;
+        });
+
+        renderProjects();
+      }
+
+      function applyProjectDateFilter(project, dateFilter) {
+        if (!dateFilter || dateFilter === 'all') return true;
+        
+        if (!project.createdAt) return false;
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const projectDate = new Date(project.createdAt);
+        projectDate.setHours(0, 0, 0, 0);
+
+        switch (dateFilter) {
+          case 'today':
+            return projectDate.getTime() === today.getTime();
+          
+          case 'week':
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            return projectDate >= weekAgo;
+          
+          case 'month':
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            return projectDate >= monthAgo;
+          
+          case 'custom':
+            const fromDate = document.getElementById('projectFromDate')?.value;
+            const toDate = document.getElementById('projectToDate')?.value;
+            
+            if (fromDate && toDate) {
+              const from = new Date(fromDate);
+              const to = new Date(toDate);
+              return projectDate >= from && projectDate <= to;
+            } else if (fromDate) {
+              return projectDate >= new Date(fromDate);
+            } else if (toDate) {
+              return projectDate <= new Date(toDate);
+            }
+            return true;
+          
+          default:
+            return true;
+        }
+      }
+
+      function renderProjects() {
+        const list = document.getElementById('projectsList');
+        list.innerHTML = '';
+        
+        if (filteredProjects.length === 0) {
+          list.innerHTML = '<div class="text-gray-500 text-center py-4 col-span-3">No projects found matching your filters.</div>';
+          return;
+        }
+        
+        filteredProjects.forEach(project => {
           const card = document.createElement('div');
           card.className = "glass-card rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]";
           card.innerHTML = `
@@ -1413,23 +1580,23 @@
                   <i class="fas fa-project-diagram text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-bold text-gray-800">${p.name}</h3>
-                  <span class="text-xs px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-medium">${p.status}</span>
+                  <h3 class="text-lg font-bold text-gray-800">${project.name}</h3>
+                  <span class="text-xs px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 font-medium">${project.status}</span>
                 </div>
               </div>
             </div>
-            <p class="text-gray-600 mb-4 line-clamp-2">${p.desc}</p>
+            <p class="text-gray-600 mb-4 line-clamp-2">${project.desc}</p>
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-              <button class="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200" onclick="openProjectStatusModal('${doc.id}', '${p.status}')">
+              <button class="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200" onclick="openProjectStatusModal('${project.id}', '${project.status}')">
                 <i class="fas fa-edit"></i>
                 Status
               </button>
               <div class="flex gap-2">
-                <button class="flex items-center gap-1 text-indigo-600 hover:bg-indigo-50 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200" onclick="editProject('${doc.id}')">
+                <button class="flex items-center gap-1 text-indigo-600 hover:bg-indigo-50 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200" onclick="editProject('${project.id}')">
                   <i class="fas fa-edit"></i>
                   Edit
                 </button>
-                <button class="flex items-center gap-1 text-red-600 hover:bg-red-50 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200" onclick="deleteProject('${doc.id}')">
+                <button class="flex items-center gap-1 text-red-600 hover:bg-red-50 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200" onclick="deleteProject('${project.id}')">
                   <i class="fas fa-trash"></i>
                   Delete
                 </button>
@@ -1439,6 +1606,7 @@
           list.appendChild(card);
         });
       }
+
       async function deleteProject(id) {
         if (confirm("Delete this project?")) {
           await db.collection('projects').doc(id).delete();
@@ -1446,6 +1614,35 @@
           loadDashboardCounts();
         }
       }
+
+      function handleProjectDateFilterChange() {
+        const dateFilter = document.getElementById('projectDateFilter').value;
+        const customRange = document.getElementById('customProjectDateRange');
+        
+        if (dateFilter === 'custom') {
+          customRange.classList.remove('hidden');
+        } else {
+          customRange.classList.add('hidden');
+        }
+        
+        applyProjectFilters();
+      }
+
+      function clearProjectFilters() {
+        document.getElementById('projectSearchInput').value = '';
+        document.getElementById('projectDateFilter').value = 'all';
+        document.getElementById('projectFromDate').value = '';
+        document.getElementById('projectToDate').value = '';
+        document.getElementById('customProjectDateRange').classList.add('hidden');
+        applyProjectFilters();
+      }
+
+      // Setup project filter event listeners
+      document.getElementById('projectSearchInput')?.addEventListener('input', applyProjectFilters);
+      document.getElementById('projectDateFilter')?.addEventListener('change', handleProjectDateFilterChange);
+      document.getElementById('projectFromDate')?.addEventListener('change', applyProjectFilters);
+      document.getElementById('projectToDate')?.addEventListener('change', applyProjectFilters);
+      document.getElementById('clearProjectFilters')?.addEventListener('click', clearProjectFilters);
 
       // Tasks modal logic
       const taskModal = document.getElementById('taskModal');
@@ -1536,19 +1733,98 @@
         }
       };
 
+      // Tasks filtering
+      let allTasks = [];
+      let filteredTasks = [];
+
       async function loadTasks() {
-        const list = document.getElementById('tasksList');
-        list.innerHTML = '';
         const snap = await db.collection('tasks').orderBy('createdAt', 'desc').get();
-        if (snap.empty) {
-          list.innerHTML = '<div class="text-gray-500 text-center py-4 col-span-3">No tasks yet.</div>';
-          return;
-        }
+        allTasks = [];
         snap.forEach(doc => {
           const t = doc.data();
+          allTasks.push({
+            id: doc.id,
+            ...t,
+            createdAt: t.createdAt?.toDate() || new Date()
+          });
+        });
+        applyTaskFilters();
+      }
+
+      function applyTaskFilters() {
+        const searchTerm = document.getElementById('taskSearchInput')?.value.toLowerCase() || '';
+        const dateFilter = document.getElementById('taskDateFilter')?.value || 'today';
+
+        filteredTasks = allTasks.filter(task => {
+          const matchesSearch = !searchTerm || 
+            task.title?.toLowerCase().includes(searchTerm) ||
+            task.desc?.toLowerCase().includes(searchTerm);
+          
+          const matchesDate = applyTaskDateFilter(task, dateFilter);
+          
+          return matchesSearch && matchesDate;
+        });
+
+        renderTasks();
+      }
+
+      function applyTaskDateFilter(task, dateFilter) {
+        if (!dateFilter || dateFilter === 'all') return true;
+        
+        if (!task.deadline) return false;
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const taskDeadline = new Date(task.deadline);
+        taskDeadline.setHours(0, 0, 0, 0);
+
+        switch (dateFilter) {
+          case 'today':
+            return taskDeadline.getTime() === today.getTime();
+          
+          case 'week':
+            const weekFromNow = new Date(today);
+            weekFromNow.setDate(weekFromNow.getDate() + 7);
+            return taskDeadline >= today && taskDeadline <= weekFromNow;
+          
+          case 'month':
+            const monthFromNow = new Date(today);
+            monthFromNow.setMonth(monthFromNow.getMonth() + 1);
+            return taskDeadline >= today && taskDeadline <= monthFromNow;
+          
+          case 'custom':
+            const fromDate = document.getElementById('taskFromDate')?.value;
+            const toDate = document.getElementById('taskToDate')?.value;
+            
+            if (fromDate && toDate) {
+              const from = new Date(fromDate);
+              const to = new Date(toDate);
+              return taskDeadline >= from && taskDeadline <= to;
+            } else if (fromDate) {
+              return taskDeadline >= new Date(fromDate);
+            } else if (toDate) {
+              return taskDeadline <= new Date(toDate);
+            }
+            return true;
+          
+          default:
+            return true;
+        }
+      }
+
+      function renderTasks() {
+        const list = document.getElementById('tasksList');
+        list.innerHTML = '';
+        
+        if (filteredTasks.length === 0) {
+          list.innerHTML = '<div class="text-gray-500 text-center py-4 col-span-3">No tasks found matching your filters.</div>';
+          return;
+        }
+        
+        filteredTasks.forEach(task => {
           const card = document.createElement('div');
           card.className = "glass-card rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]";
-          const deadlineDate = new Date(t.deadline);
+          const deadlineDate = new Date(task.deadline);
           const isOverdue = deadlineDate < new Date();
           card.innerHTML = `
             <div class="flex items-start justify-between mb-4">
@@ -1557,15 +1833,15 @@
                   <i class="fas fa-tasks text-white"></i>
                 </div>
                 <div>
-                  <h3 class="text-lg font-bold text-gray-800">${t.title}</h3>
+                  <h3 class="text-lg font-bold text-gray-800">${task.title}</h3>
                   <div class="flex items-center gap-2 mt-1">
-                    <span class="text-xs px-3 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">${t.status}</span>
-                    ${(t.priority && t.priority.trim()) ? `<span class="text-xs px-2 py-1 rounded-full border font-medium ${getPriorityColor(t.priority)}">${t.priority.charAt(0).toUpperCase() + t.priority.slice(1)}</span>` : `<span class="text-xs px-2 py-1 rounded-full border font-medium ${getPriorityColor('medium')}">Medium</span>`}
+                    <span class="text-xs px-3 py-1 rounded-full bg-purple-100 text-purple-700 font-medium">${task.status}</span>
+                    ${(task.priority && task.priority.trim()) ? `<span class="text-xs px-2 py-1 rounded-full border font-medium ${getPriorityColor(task.priority)}">${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>` : `<span class="text-xs px-2 py-1 rounded-full border font-medium ${getPriorityColor('medium')}">Medium</span>`}
                   </div>
                 </div>
               </div>
             </div>
-            <p class="text-gray-600 mb-4 line-clamp-2">${t.desc}</p>
+            <p class="text-gray-600 mb-4 line-clamp-2">${task.desc}</p>
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div class="flex items-center gap-2 text-sm">
                 <i class="fas fa-calendar text-gray-400"></i>
@@ -1575,25 +1851,25 @@
               </div>
               <div class="flex items-center gap-2 text-sm">
                 <i class="fas fa-clock text-gray-400"></i>
-                <span class="text-teal-600 font-medium">${formatTimeDisplay(t.totalTime || 0)}</span>
+                <span class="text-teal-600 font-medium">${formatTimeDisplay(task.totalTime || 0)}</span>
               </div>
             </div>
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
               <div class="flex gap-2">
-                <button class="flex items-center gap-2 bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200" onclick="openTimerModal('${doc.id}', '${t.title}')">
+                <button class="flex items-center gap-2 bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200" onclick="openTimerModal('${task.id}', '${task.title}')">
                   <i class="fas fa-play"></i>
                   Timer
                 </button>
-                <button class="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200" onclick="openStatusModal('${doc.id}', '${t.status}')">
+                <button class="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200" onclick="openStatusModal('${task.id}', '${task.status}')">
                   <i class="fas fa-edit"></i>
                   Status
                 </button>
               </div>
               <div class="flex gap-1">
-                <button class="flex items-center gap-1 text-purple-600 hover:bg-purple-50 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200" onclick="editTask('${doc.id}')">
+                <button class="flex items-center gap-1 text-purple-600 hover:bg-purple-50 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200" onclick="editTask('${task.id}')">
                   <i class="fas fa-edit"></i>
                 </button>
-                <button class="flex items-center gap-1 text-red-600 hover:bg-red-50 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200" onclick="deleteTask('${doc.id}')">
+                <button class="flex items-center gap-1 text-red-600 hover:bg-red-50 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200" onclick="deleteTask('${task.id}')">
                   <i class="fas fa-trash"></i>
                 </button>
               </div>
@@ -1602,6 +1878,7 @@
           list.appendChild(card);
         });
       }
+
       async function deleteTask(id) {
         if (confirm("Delete this task?")) {
           await db.collection('tasks').doc(id).delete();
@@ -1609,6 +1886,35 @@
           loadDashboardCounts();
         }
       }
+
+      function handleTaskDateFilterChange() {
+        const dateFilter = document.getElementById('taskDateFilter').value;
+        const customRange = document.getElementById('customTaskDateRange');
+        
+        if (dateFilter === 'custom') {
+          customRange.classList.remove('hidden');
+        } else {
+          customRange.classList.add('hidden');
+        }
+        
+        applyTaskFilters();
+      }
+
+      function clearTaskFilters() {
+        document.getElementById('taskSearchInput').value = '';
+        document.getElementById('taskDateFilter').value = 'today';
+        document.getElementById('taskFromDate').value = '';
+        document.getElementById('taskToDate').value = '';
+        document.getElementById('customTaskDateRange').classList.add('hidden');
+        applyTaskFilters();
+      }
+
+      // Setup task filter event listeners
+      document.getElementById('taskSearchInput')?.addEventListener('input', applyTaskFilters);
+      document.getElementById('taskDateFilter')?.addEventListener('change', handleTaskDateFilterChange);
+      document.getElementById('taskFromDate')?.addEventListener('change', applyTaskFilters);
+      document.getElementById('taskToDate')?.addEventListener('change', applyTaskFilters);
+      document.getElementById('clearTaskFilters')?.addEventListener('click', clearTaskFilters);
       async function populateTaskModal() {
         try {
           // Projects dropdown
@@ -1957,7 +2263,7 @@
       // ============================
       
       let adminTasks = [];
-      let filteredTasks = [];
+      let adminFilteredTasks = [];
       let currentSort = { field: 'createdAt', order: 'desc' };
       let selectedTasks = new Set();
 
@@ -2021,7 +2327,7 @@
         const priorityFilter = document.getElementById('adminPriorityFilter').value;
         const dateFilter = document.getElementById('adminDateFilter').value;
         
-        filteredTasks = adminTasks.filter(task => {
+        adminFilteredTasks = adminTasks.filter(task => {
           // Search filter
           if (searchTerm && !task.title.toLowerCase().includes(searchTerm) && 
               !task.desc.toLowerCase().includes(searchTerm)) {
@@ -2080,7 +2386,7 @@
 
       // Sort tasks
       function sortAdminTasks() {
-        filteredTasks.sort((a, b) => {
+        adminFilteredTasks.sort((a, b) => {
           let aVal = a[currentSort.field];
           let bVal = b[currentSort.field];
           
@@ -2104,16 +2410,16 @@
         const tbody = document.getElementById('adminTaskTableBody');
         tbody.innerHTML = '';
         
-        if (filteredTasks.length === 0) {
+        if (adminFilteredTasks.length === 0) {
           document.getElementById('tableEmpty').style.display = 'block';
           document.getElementById('resultsCount').textContent = 'No tasks found';
           return;
         }
         
         document.getElementById('tableEmpty').style.display = 'none';
-        document.getElementById('resultsCount').textContent = `${filteredTasks.length} tasks found`;
+        document.getElementById('resultsCount').textContent = `${adminFilteredTasks.length} tasks found`;
         
-        filteredTasks.forEach(task => {
+        adminFilteredTasks.forEach(task => {
           const row = document.createElement('tr');
           row.className = 'hover:bg-gray-50';
           
@@ -2190,12 +2496,12 @@
 
       // Update admin statistics
       function updateAdminStats() {
-        const totalTasks = filteredTasks.length;
-        const completedTasks = filteredTasks.filter(t => t.status === 'completed').length;
-        const overdueTasks = filteredTasks.filter(t => {
+        const totalTasks = adminFilteredTasks.length;
+        const completedTasks = adminFilteredTasks.filter(t => t.status === 'completed').length;
+        const overdueTasks = adminFilteredTasks.filter(t => {
           return t.deadline && new Date(t.deadline) < new Date() && t.status !== 'completed';
         }).length;
-        const totalTime = filteredTasks.reduce((sum, t) => sum + (t.totalTime || 0), 0);
+        const totalTime = adminFilteredTasks.reduce((sum, t) => sum + (t.totalTime || 0), 0);
         
         document.getElementById('adminTotalTasks').textContent = totalTasks;
         document.getElementById('adminCompletedTasks').textContent = completedTasks;
@@ -2347,10 +2653,10 @@
         
         document.getElementById('refreshTasks').addEventListener('click', loadAdminTasks);
         document.getElementById('exportAll').addEventListener('click', function() {
-          exportTasksToCSV(filteredTasks, 'all_tasks.csv');
+          exportTasksToCSV(adminFilteredTasks, 'all_tasks.csv');
         });
         document.getElementById('exportSelected').addEventListener('click', function() {
-          const selected = filteredTasks.filter(t => selectedTasks.has(t.id));
+          const selected = adminFilteredTasks.filter(t => selectedTasks.has(t.id));
           if (selected.length > 0) {
             exportTasksToCSV(selected, 'selected_tasks.csv');
           } else {

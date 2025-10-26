@@ -449,9 +449,16 @@ function renderReportsList() {
             </p>
           </div>
         </div>
-        <span class="text-xs text-gray-500">
-          ${formatTimestamp(report.submittedAt)}
-        </span>
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-gray-500">
+            ${formatTimestamp(report.submittedAt)}
+          </span>
+          <button onclick="deleteReport('${report.id}')" 
+                  class="text-red-600 hover:bg-red-50 px-3 py-1 rounded-lg transition-all duration-200"
+                  title="Delete Report">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
       </div>
       
       <div class="space-y-3">
@@ -561,4 +568,17 @@ function formatTimestamp(timestamp) {
   return date.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+async function deleteReport(reportId) {
+  if (confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+    try {
+      await db.collection('dailyReports').doc(reportId).delete();
+      console.log('Report deleted successfully');
+    } catch (error) {
+      console.error('Error deleting report:', error);
+      alert('Error deleting report. Please try again.');
+    }
+  }
+}
+
 window.removeResource = removeResource;
+window.deleteReport = deleteReport;
