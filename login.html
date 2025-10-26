@@ -199,7 +199,7 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
       const user = await login(email, password);
-      if (user) window.location.href = "dashboard.html";
+      if (user) window.location.href = "index.html";
     });
 
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
@@ -208,7 +208,7 @@
       const password = document.getElementById('regPassword').value;
       const role = document.getElementById('role').value;
       const user = await register(email, password, role);
-      if (user) window.location.href = "dashboard.html";
+      if (user) window.location.href = "index.html";
     });
   </script>
 </body>

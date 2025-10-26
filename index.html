@@ -139,6 +139,10 @@
           <i class="fas fa-chart-line w-5"></i>
           <span>Analytics</span>
         </a>
+        <a href="#" class="nav-item" id="navDailyReport">
+          <i class="fas fa-clipboard-list w-5"></i>
+          <span>Daily Report</span>
+        </a>
         <!-- Admin Only Section -->
         <div class="border-t border-gray-200 my-4"></div>
         <a href="#" class="nav-item hidden" id="navAdmin">
@@ -238,13 +242,18 @@
               <div class="stat-icon bg-gradient-to-br from-teal-500 to-teal-600 text-white">
                 <i class="fas fa-clock"></i>
               </div>
-              <span class="text-xs font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded-full">Hours</span>
+              <select id="timePeriodFilter" class="text-xs font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded-full border-none cursor-pointer hover:bg-teal-100 transition-colors">
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="all">All Time</option>
+              </select>
             </div>
             <div class="text-3xl font-extrabold text-gray-800 mb-1" id="timeSpent">00:00:00</div>
             <div class="text-sm font-medium text-gray-600">Time Tracked</div>
             <div class="flex items-center mt-2 text-xs text-blue-600">
               <i class="fas fa-clock mr-1"></i>
-              <span>This month</span>
+              <span id="timePeriodLabel">Today</span>
             </div>
           </div>
 
@@ -423,7 +432,7 @@
       </section>
 
       <!-- Admin Task Management Section -->
-      <section id="adminSection" style="display:none;" class="space-y-6">
+      <section id="adminSection" style="display:none;" class="space-y-6 max-w-full overflow-hidden">
         <div class="mb-8">
           <h2 class="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-3">
             <i class="fas fa-users-cog text-red-600"></i>
@@ -571,8 +580,8 @@
             </div>
           </div>
           
-          <div class="overflow-x-auto">
-            <table class="w-full" id="adminTaskTable">
+          <div class="overflow-x-auto max-w-full">
+            <table class="w-full min-w-[1200px]" id="adminTaskTable">
               <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th class="px-4 py-4 text-left">
@@ -664,6 +673,256 @@
             </div>
             <div class="text-2xl font-bold text-gray-800" id="adminTotalTime">00:00:00</div>
             <div class="text-sm text-gray-600">Total Time</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Daily Report Section -->
+      <section id="dailyReportSection" style="display:none;" class="space-y-6">
+        <div class="mb-8">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+            <i class="fas fa-clipboard-list text-teal-600"></i>
+            Daily Report
+          </h2>
+          <p class="text-gray-600">Submit your daily work report and track team progress</p>
+        </div>
+
+        <!-- Admin Tabs (Only visible to admin) -->
+        <div id="adminReportTabs" class="hidden mb-6">
+          <div class="flex gap-4 border-b border-gray-200">
+            <button id="tabSubmitReport" class="px-6 py-3 font-semibold text-teal-600 border-b-2 border-teal-600">
+              Submit My Report
+            </button>
+            <button id="tabViewReports" class="px-6 py-3 font-semibold text-gray-600 hover:text-teal-600">
+              View Team Reports
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit Report Form (For both admin and team) -->
+        <div id="reportSubmitSection">
+          <div class="glass-card rounded-2xl p-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <i class="fas fa-edit text-teal-600"></i>
+              <span id="reportFormTitle">Submit Daily Report</span>
+            </h3>
+
+            <!-- Check if already submitted today -->
+            <div id="alreadySubmittedNotice" class="hidden mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+              <div class="flex items-center gap-3">
+                <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                <div>
+                  <p class="font-semibold text-green-800">Report Already Submitted</p>
+                  <p class="text-sm text-green-600">You can edit your report until end of day</p>
+                </div>
+              </div>
+            </div>
+
+            <form id="dailyReportForm" class="space-y-6">
+              <!-- Report Date (Read-only, auto-filled with today) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                <input type="date" id="reportDate" readonly 
+                  class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl cursor-not-allowed">
+              </div>
+
+              <!-- Tasks Completed -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-check-circle text-green-600 mr-1"></i>
+                  Tasks Completed Today
+                </label>
+                <textarea id="tasksCompleted" rows="3" required placeholder="List the tasks you completed today..."
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300 focus:border-transparent"></textarea>
+              </div>
+
+              <!-- Blockers/Issues -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-exclamation-triangle text-orange-600 mr-1"></i>
+                  Blockers or Issues Faced
+                </label>
+                <textarea id="blockers" rows="2" placeholder="Any challenges or blockers you faced (optional)..."
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300 focus:border-transparent"></textarea>
+              </div>
+
+              <!-- Tomorrow's Plan -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-calendar-day text-blue-600 mr-1"></i>
+                  Tomorrow's Plan
+                </label>
+                <textarea id="tomorrowPlan" rows="3" placeholder="What do you plan to work on tomorrow?..."
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300 focus:border-transparent"></textarea>
+              </div>
+
+              <!-- Time Spent -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-clock text-purple-600 mr-1"></i>
+                  Total Hours Worked Today
+                </label>
+                <input type="number" id="hoursWorked" step="0.5" min="0" max="24" placeholder="8.5"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300 focus:border-transparent">
+              </div>
+
+              <!-- Additional Notes -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-sticky-note text-yellow-600 mr-1"></i>
+                  Additional Notes (Optional)
+                </label>
+                <textarea id="additionalNotes" rows="2" placeholder="Any other information you'd like to share..."
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300 focus:border-transparent"></textarea>
+              </div>
+
+              <!-- Resources Section -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-3">
+                  <i class="fas fa-link text-indigo-600 mr-1"></i>
+                  Resources / Links (Optional)
+                </label>
+                <div id="resourcesList" class="space-y-3">
+                  <!-- Resource items will be added here -->
+                </div>
+                <button type="button" id="addResourceBtn"
+                  class="mt-3 flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg transition-all duration-200">
+                  <i class="fas fa-plus"></i>
+                  <span>Add Resource Link</span>
+                </button>
+              </div>
+
+              <!-- Submit Buttons -->
+              <div class="flex gap-4 pt-4">
+                <button type="submit" id="submitReportBtn"
+                  class="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white px-6 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 font-semibold">
+                  <i class="fas fa-paper-plane"></i>
+                  <span>Submit Report</span>
+                </button>
+                <button type="button" id="clearReportBtn"
+                  class="px-6 py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold transition-all duration-200">
+                  Clear
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- View Team Reports (Admin Only) -->
+        <div id="reportViewSection" style="display:none;">
+          <!-- Filter Panel -->
+          <div class="glass-card rounded-2xl p-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fas fa-filter text-blue-600"></i>
+              Filters
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Search -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <input type="text" id="reportSearchInput" placeholder="Search by name, tasks..."
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300">
+              </div>
+              
+              <!-- Team Member -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Team Member</label>
+                <select id="reportPersonFilter" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300">
+                  <option value="">All Members</option>
+                </select>
+              </div>
+              
+              <!-- Date Range -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Date Filter</label>
+                <select id="reportDateFilter" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300">
+                  <option value="today">Today</option>
+                  <option value="yesterday">Yesterday</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                  <option value="all">All Time</option>
+                  <option value="custom">Custom Range</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Custom Date Range -->
+            <div id="customReportDateRange" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                <input type="date" id="reportFromDate" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                <input type="date" id="reportToDate" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-teal-300">
+              </div>
+            </div>
+
+            <!-- Filter Actions -->
+            <div class="flex gap-3 mt-4">
+              <button id="applyReportFilters"
+                class="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition-all">
+                Apply Filters
+              </button>
+              <button id="clearReportFilters"
+                class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-all">
+                Clear
+              </button>
+              <button id="exportReports"
+                class="ml-auto px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-all">
+                <i class="fas fa-download mr-2"></i>Export CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Submission Stats -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-users text-blue-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="totalReportsCount">0</div>
+              <div class="text-sm text-gray-600">Total Reports</div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-check-circle text-green-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="todaySubmissionsCount">0</div>
+              <div class="text-sm text-gray-600">Today's Submissions</div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-clock text-orange-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="pendingSubmissionsCount">0</div>
+              <div class="text-sm text-gray-600">Pending Today</div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-percentage text-purple-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="submissionRate">0%</div>
+              <div class="text-sm text-gray-600">Submission Rate</div>
+            </div>
+          </div>
+
+          <!-- Reports List -->
+          <div class="glass-card rounded-2xl p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center justify-between">
+              <span>
+                <i class="fas fa-list text-teal-600 mr-2"></i>
+                Team Reports
+              </span>
+              <span class="text-sm font-normal text-gray-600" id="reportResultsCount">0 reports found</span>
+            </h3>
+            <div id="reportsList" class="space-y-4">
+              <!-- Reports will be populated here -->
+            </div>
           </div>
         </div>
       </section>
@@ -913,6 +1172,10 @@
       const auth = firebase.auth();
       const db = firebase.firestore();
       
+      // Global variables needed by reports.js and other modules
+      var currentUser = null;
+      var currentUserRole = null;
+      
       // Global time formatting function
       function formatTimeDisplay(seconds) {
         const hours = Math.floor(seconds / 3600);
@@ -928,6 +1191,7 @@
         document.getElementById('tasksSection').style.display = sectionId === 'tasksSection' ? 'block' : 'none';
         document.getElementById('analyticsSection').style.display = sectionId === 'analyticsSection' ? 'block' : 'none';
         document.getElementById('adminSection').style.display = sectionId === 'adminSection' ? 'block' : 'none';
+        document.getElementById('dailyReportSection').style.display = sectionId === 'dailyReportSection' ? 'block' : 'none';
         
         // Update navigation active states
         document.querySelectorAll('.nav-item').forEach(a => a.classList.remove("sidebar-active"));
@@ -936,10 +1200,18 @@
         if (sectionId === "tasksSection") document.getElementById("navTasks").classList.add("sidebar-active");
         if (sectionId === "analyticsSection") document.getElementById("navAnalytics").classList.add("sidebar-active");
         if (sectionId === "adminSection") document.getElementById("navAdmin").classList.add("sidebar-active");
+        if (sectionId === "dailyReportSection") document.getElementById("navDailyReport").classList.add("sidebar-active");
         
         // Load admin data when admin section is shown
         if (sectionId === "adminSection") {
           loadAdminTasks();
+        }
+        
+        // Initialize Daily Reports when daily report section is shown
+        if (sectionId === "dailyReportSection") {
+          if (typeof initializeDailyReports === 'function') {
+            initializeDailyReports();
+          }
         }
       }
       document.getElementById("navDashboard").onclick = e => { e.preventDefault(); showSection("dashboardSection"); };
@@ -947,12 +1219,17 @@
       document.getElementById("navTasks").onclick = e => { e.preventDefault(); showSection("tasksSection"); };
       document.getElementById("navAnalytics").onclick = e => { e.preventDefault(); showSection("analyticsSection"); };
       document.getElementById("navAdmin").onclick = e => { e.preventDefault(); showSection("adminSection"); };
+      document.getElementById("navDailyReport").onclick = e => { e.preventDefault(); showSection("dailyReportSection"); };
 
       // Auth and dashboard
       auth.onAuthStateChanged(async (user) => {
         if (!user) { window.location.href = "login.html"; return; }
         const userDoc = await db.collection('users').doc(user.uid).get();
         const userInfo = userDoc.data();
+        
+        // Set global variables for use in other modules
+        currentUser = user;
+        currentUserRole = userInfo.role;
         
         // Update header welcome message
         document.getElementById('welcome').innerHTML = `
@@ -983,21 +1260,69 @@
         showSection("dashboardSection");
       });
 
-      async function loadDashboardCounts() {
+      async function loadDashboardCounts(timePeriod = 'today') {
         const projectsSnap = await db.collection('projects').get();
         document.getElementById('projectCount').textContent = projectsSnap.size;
         const tasksSnap = await db.collection('tasks').get();
         document.getElementById('taskCount').textContent = tasksSnap.size;
+        
+        // Calculate date range based on time period
+        const now = new Date();
+        let startDate = null;
+        
+        if (timePeriod === 'today') {
+          startDate = new Date();
+          startDate.setHours(0, 0, 0, 0);
+        } else if (timePeriod === 'week') {
+          startDate = new Date();
+          startDate.setDate(startDate.getDate() - 7);
+          startDate.setHours(0, 0, 0, 0); // Normalize to midnight
+        } else if (timePeriod === 'month') {
+          startDate = new Date();
+          startDate.setMonth(startDate.getMonth() - 1);
+          startDate.setHours(0, 0, 0, 0); // Normalize to midnight
+        }
+        // 'all' means no filter, startDate remains null
+        
         let totalTime = 0;
         let usersSet = new Set();
         tasksSnap.forEach(doc => {
           const t = doc.data();
+          
+          // Filter by time period if not 'all'
+          if (startDate && t.createdAt) {
+            const taskDate = t.createdAt.toDate();
+            if (taskDate < startDate) {
+              return; // Skip this task
+            }
+          }
+          
           if (t.totalTime) totalTime += t.totalTime;
           if (t.assignedTo) usersSet.add(t.assignedTo);
         });
+        
         document.getElementById('timeSpent').textContent = formatTimeDisplay(totalTime);
         document.getElementById('activeUsers').textContent = usersSet.size;
+        
+        // Update label
+        const labels = {
+          'today': 'Today',
+          'week': 'This Week',
+          'month': 'This Month',
+          'all': 'All Time'
+        };
+        document.getElementById('timePeriodLabel').textContent = labels[timePeriod] || 'Today';
       }
+      
+      // Add event listener for time period filter
+      document.addEventListener('DOMContentLoaded', function() {
+        const timePeriodFilter = document.getElementById('timePeriodFilter');
+        if (timePeriodFilter) {
+          timePeriodFilter.addEventListener('change', function() {
+            loadDashboardCounts(this.value);
+          });
+        }
+      });
 
       // Projects modal logic
       const projectModal = document.getElementById('projectModal');
@@ -1095,10 +1420,10 @@
             </div>
             <p class="text-gray-600 mb-4 line-clamp-2">${p.desc}</p>
             <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-              <div class="flex items-center gap-2 text-xs text-gray-500">
-                <i class="fas fa-clock"></i>
-                <span>Created ${new Date(p.createdAt?.toDate()).toLocaleDateString()}</span>
-              </div>
+              <button class="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200" onclick="openProjectStatusModal('${doc.id}', '${p.status}')">
+                <i class="fas fa-edit"></i>
+                Status
+              </button>
               <div class="flex gap-2">
                 <button class="flex items-center gap-1 text-indigo-600 hover:bg-indigo-50 px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200" onclick="editProject('${doc.id}')">
                   <i class="fas fa-edit"></i>
@@ -1384,6 +1709,40 @@
         }
       }
 
+      // Project Status Update Functions
+      window.openProjectStatusModal = async function(projectId, currentStatus) {
+        const projectStatusModal = document.getElementById('projectStatusModal');
+        projectStatusModal.classList.remove('hidden');
+        projectStatusModal.dataset.projectId = projectId;
+        // Highlight current status
+        document.querySelectorAll('#projectStatusModal .project-status-btn').forEach(btn => {
+          btn.classList.remove('ring-2', 'ring-offset-2');
+          if (btn.dataset.status === currentStatus) {
+            btn.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500');
+          }
+        });
+      }
+
+      window.updateProjectStatusDirect = async function(newStatus) {
+        const projectStatusModal = document.getElementById('projectStatusModal');
+        const projectId = projectStatusModal.dataset.projectId;
+        
+        try {
+          await db.collection('projects').doc(projectId).update({
+            status: newStatus,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          
+          projectStatusModal.classList.add('hidden');
+          loadProjects();
+          loadDashboardCounts();
+          
+          console.log(`Project status updated to: ${newStatus}`);
+        } catch (error) {
+          alert(`Error updating project status: ${error.message}`);
+        }
+      }
+
       // Priority color function
       function getPriorityColor(priority) {
         const colors = {
@@ -1514,15 +1873,29 @@
         const recentActivityDiv = document.getElementById('recentActivity');
         recentActivityDiv.innerHTML = '';
 
-        // Get recent tasks (sorted by creation date)
+        // Get today's date range
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        // Get recent tasks - TODAY ONLY (sorted by creation date)
         const recentTasks = tasks
-          .filter(t => t.createdAt)
+          .filter(t => {
+            if (!t.createdAt) return false;
+            const taskDate = t.createdAt.toDate();
+            return taskDate >= today && taskDate < tomorrow;
+          })
           .sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate())
           .slice(0, 5);
 
-        // Get recent projects
+        // Get recent projects - TODAY ONLY
         const recentProjects = projects
-          .filter(p => p.createdAt)
+          .filter(p => {
+            if (!p.createdAt) return false;
+            const projectDate = p.createdAt.toDate();
+            return projectDate >= today && projectDate < tomorrow;
+          })
           .sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate())
           .slice(0, 3);
 
@@ -2087,11 +2460,49 @@
     </div>
   </div>
   
+  <!-- Project Status Update Modal -->
+  <div id="projectStatusModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
+    <div class="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl w-full max-w-md p-8 m-4 border border-white/20 text-center transform transition-all duration-300">
+      <div class="mb-6">
+        <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <i class="fas fa-edit text-white text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Update Project Status</h3>
+        <p class="text-gray-600 text-sm">Select the new status for this project</p>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-3 mb-6">
+        <button class="project-status-btn px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-[1.02]" data-status="active" onclick="updateProjectStatusDirect('active')">
+          <i class="fas fa-play-circle mb-1"></i><br>
+          Active
+        </button>
+        <button class="project-status-btn px-4 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-[1.02]" data-status="in-progress" onclick="updateProjectStatusDirect('in-progress')">
+          <i class="fas fa-clock mb-1"></i><br>
+          In Progress
+        </button>
+        <button class="project-status-btn px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-[1.02]" data-status="completed" onclick="updateProjectStatusDirect('completed')">
+          <i class="fas fa-check-circle mb-1"></i><br>
+          Completed
+        </button>
+        <button class="project-status-btn px-4 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-[1.02]" data-status="on-hold" onclick="updateProjectStatusDirect('on-hold')">
+          <i class="fas fa-pause-circle mb-1"></i><br>
+          On Hold
+        </button>
+      </div>
+      
+      <button class="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-medium transition-all duration-200" onclick="document.getElementById('projectStatusModal').classList.add('hidden')">
+        Cancel
+      </button>
+    </div>
+  </div>
+  
   <!-- Custom JavaScript Files -->
   <script src="js/firebase.js"></script>
   <script src="js/auth.js"></script>
-  <script src="js/dashboard.js"></script>
-  <script src="js/projects.js"></script>
+  <!-- dashboard.js and projects.js commented out to avoid duplicate variable declarations -->
+  <!-- <script src="js/dashboard.js"></script> -->
+  <!-- <script src="js/projects.js"></script> -->
   <script src="js/timer.js"></script>
+  <script src="js/reports.js"></script>
 </body>
 </html>

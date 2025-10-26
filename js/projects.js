@@ -1,20 +1,5 @@
-const projectModal = document.getElementById('projectModal');
-const addProjectBtn = document.getElementById('addProjectBtn');
-const closeProjectModal = document.getElementById('closeProjectModal');
-const projectForm = document.getElementById('projectForm');
-
-const taskModal = document.getElementById('taskModal');
-const addTaskBtn = document.getElementById('addTaskBtn');
-const closeTaskModal = document.getElementById('closeTaskModal');
-const taskForm = document.getElementById('taskForm');
-
-addProjectBtn.onclick = () => { projectModal.classList.remove('hidden'); };
-closeProjectModal.onclick = () => { projectModal.classList.add('hidden'); };
-projectModal.onclick = (e) => { if (e.target === projectModal) closeProjectModal.onclick(); };
-
-addTaskBtn.onclick = () => { taskModal.classList.remove('hidden'); populateTaskModal(); };
-closeTaskModal.onclick = () => { taskModal.classList.add('hidden'); };
-taskModal.onclick = (e) => { if (e.target === taskModal) closeTaskModal.onclick(); };
+// Note: Modal elements and event handlers are set up in index.html inline scripts
+// to avoid duplicate declarations
 
 projectForm.onsubmit = async (e) => {
   e.preventDefault();
