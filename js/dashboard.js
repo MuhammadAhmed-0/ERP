@@ -31,6 +31,18 @@ onAuthStateChanged(async (user) => {
     navAdmin.classList.add('hidden');
   }
   
+  // Show/hide admin-only buttons for Projects and Tasks
+  const addProjectBtn = document.getElementById('addProjectBtn');
+  const addTaskBtn = document.getElementById('addTaskBtn');
+  
+  if (userInfo.role !== 'admin') {
+    if (addProjectBtn) addProjectBtn.style.display = 'none';
+    if (addTaskBtn) addTaskBtn.style.display = 'none';
+  } else {
+    if (addProjectBtn) addProjectBtn.style.display = 'flex';
+    if (addTaskBtn) addTaskBtn.style.display = 'flex';
+  }
+  
   // Initialize navigation
   initializeNavigation();
   
@@ -46,7 +58,18 @@ onAuthStateChanged(async (user) => {
 async function loadDashboardCounts() {
   const projectsSnap = await db.collection('projects').get();
   document.getElementById('projectCount').textContent = projectsSnap.size;
-  const tasksSnap = await db.collection('tasks').get();
+  
+  let tasksSnap;
+  const isAdmin = currentUserRole === 'admin';
+  
+  if (isAdmin) {
+    tasksSnap = await db.collection('tasks').get();
+  } else {
+    tasksSnap = await db.collection('tasks')
+      .where('assignedTo', '==', currentUser.uid)
+      .get();
+  }
+  
   document.getElementById('taskCount').textContent = tasksSnap.size;
 
   let totalTime = 0;
@@ -57,7 +80,12 @@ async function loadDashboardCounts() {
     if (t.assignedTo) usersSet.add(t.assignedTo);
   });
   document.getElementById('timeSpent').textContent = formatTimeDisplay(totalTime);
-  document.getElementById('activeUsers').textContent = usersSet.size;
+  
+  if (isAdmin) {
+    document.getElementById('activeUsers').textContent = usersSet.size;
+  } else {
+    document.getElementById('activeUsers').textContent = '1';
+  }
 }
 
 function formatTimeDisplay(seconds) {

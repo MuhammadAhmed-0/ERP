@@ -43,16 +43,26 @@ async function loadProjects() {
     const p = doc.data();
     const card = document.createElement('div');
     card.className = "bg-white rounded-xl shadow-md p-6 flex flex-col gap-2 hover:shadow-xl transition";
+    
+    const isAdmin = currentUserRole === 'admin';
+    const actionButtons = isAdmin ? `
+      <div class="flex gap-2 mt-2">
+        <button class="text-indigo-600 hover:underline" onclick="editProject('${doc.id}')">Edit</button>
+        <button class="text-red-600 hover:underline" onclick="deleteProject('${doc.id}')">Delete</button>
+      </div>
+    ` : `
+      <div class="flex gap-2 mt-2">
+        <span class="text-xs text-gray-500 italic"><i class="fas fa-eye mr-1"></i>View Only - Admin access required for changes</span>
+      </div>
+    `;
+    
     card.innerHTML = `
       <div class="flex justify-between items-center">
         <div class="text-lg font-bold text-indigo-700">${p.name}</div>
         <span class="text-xs px-2 py-1 rounded bg-indigo-50 text-indigo-600">${p.status}</span>
       </div>
       <div class="text-gray-700">${p.desc}</div>
-      <div class="flex gap-2 mt-2">
-        <button class="text-indigo-600 hover:underline" onclick="editProject('${doc.id}')">Edit</button>
-        <button class="text-red-600 hover:underline" onclick="deleteProject('${doc.id}')">Delete</button>
-      </div>
+      ${actionButtons}
     `;
     list.appendChild(card);
   });
@@ -61,7 +71,19 @@ async function loadProjects() {
 async function loadTasks() {
   const list = document.getElementById('tasksList');
   list.innerHTML = '';
-  const snap = await db.collection('tasks').orderBy('createdAt', 'desc').get();
+  
+  const isAdmin = currentUserRole === 'admin';
+  let snap;
+  
+  if (isAdmin) {
+    snap = await db.collection('tasks').orderBy('createdAt', 'desc').get();
+  } else {
+    snap = await db.collection('tasks')
+      .where('assignedTo', '==', currentUser.uid)
+      .orderBy('createdAt', 'desc')
+      .get();
+  }
+  
   snap.forEach(doc => {
     const t = doc.data();
     const priorityColors = {
@@ -72,6 +94,11 @@ async function loadTasks() {
     };
     const priorityClass = priorityColors[t.priority] || 'bg-gray-100 text-gray-700 border-gray-200';
     const totalTimeDisplay = formatTimeDisplay(t.totalTime || 0);
+    
+    const actionButtons = isAdmin ? `
+      <button class="text-purple-600 hover:underline" onclick="editTask('${doc.id}')">Edit</button>
+      <button class="text-red-600 hover:underline" onclick="deleteTask('${doc.id}')">Delete</button>
+    ` : '';
     
     const card = document.createElement('div');
     card.className = "bg-white rounded-xl shadow-md p-6 flex flex-col gap-2 hover:shadow-xl transition";
@@ -89,8 +116,7 @@ async function loadTasks() {
       ${t.timerRunning ? '<div class="text-xs text-blue-600 mt-1 font-semibold"><i class="fas fa-clock"></i> Timer Running</div>' : ''}
       <div class="flex gap-2 mt-2">
         <button class="bg-teal-600 text-white px-3 py-1 rounded-lg hover:bg-teal-700 text-xs" onclick="openTimerModal('${doc.id}', '${t.title}')">Start Timer</button>
-        <button class="text-purple-600 hover:underline" onclick="editTask('${doc.id}')">Edit</button>
-        <button class="text-red-600 hover:underline" onclick="deleteTask('${doc.id}')">Delete</button>
+        ${actionButtons}
       </div>
     `;
     list.appendChild(card);
@@ -147,8 +173,3 @@ function formatTimeDisplay(seconds) {
   const secs = seconds % 60;
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
-
-window.addEventListener('DOMContentLoaded', () => {
-  loadProjects();
-  loadTasks();
-});
