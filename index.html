@@ -143,6 +143,10 @@
           <i class="fas fa-clipboard-list w-5"></i>
           <span>Daily Report</span>
         </a>
+        <a href="#" class="nav-item" id="navCSR">
+          <i class="fas fa-headset w-5"></i>
+          <span>CSR Leads</span>
+        </a>
         <!-- Admin Only Section -->
         <div class="border-t border-gray-200 my-4"></div>
         <a href="#" class="nav-item hidden" id="navAdmin">
@@ -1014,6 +1018,449 @@
           </div>
         </div>
       </section>
+
+      <!-- CSR Leads Section -->
+      <section id="csrSection" style="display:none;" class="space-y-6">
+        <div class="mb-8">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+            <i class="fas fa-headset text-cyan-600"></i>
+            CSR Lead Management
+          </h2>
+          <p class="text-gray-600">Manage B2B leads, track follow-ups, and monitor performance</p>
+        </div>
+
+        <!-- CSR Tabs -->
+        <div class="flex gap-4 border-b border-gray-200 mb-6 overflow-x-auto">
+          <button id="tabCSRDashboard" class="px-6 py-3 font-semibold text-cyan-600 border-b-2 border-cyan-600 whitespace-nowrap">
+            <i class="fas fa-chart-pie mr-2"></i>Dashboard
+          </button>
+          <button id="tabCSRLeads" class="px-6 py-3 font-semibold text-gray-600 hover:text-cyan-600 whitespace-nowrap">
+            <i class="fas fa-list mr-2"></i>All Leads
+          </button>
+          <button id="tabCSRAddLead" class="px-6 py-3 font-semibold text-gray-600 hover:text-cyan-600 whitespace-nowrap">
+            <i class="fas fa-plus mr-2"></i>Add Lead
+          </button>
+          <button id="tabCSRMonthlyReport" class="px-6 py-3 font-semibold text-gray-600 hover:text-cyan-600 whitespace-nowrap">
+            <i class="fas fa-file-alt mr-2"></i>Monthly Report
+          </button>
+        </div>
+
+        <!-- CSR Dashboard Tab Content -->
+        <div id="csrDashboardContent">
+          <!-- Lead Statistics Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-users text-blue-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="csrTotalLeads">0</div>
+              <div class="text-sm text-gray-600">Total Leads (This Month)</div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-thumbs-up text-green-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="csrInterestedLeads">0</div>
+              <div class="text-sm text-gray-600">Interested</div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-clock text-yellow-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="csrFollowUpLeads">0</div>
+              <div class="text-sm text-gray-600">Follow-up Required</div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-envelope text-purple-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="csrEmailSentLeads">0</div>
+              <div class="text-sm text-gray-600">Email Sent</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-times-circle text-red-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="csrNotInterestedLeads">0</div>
+              <div class="text-sm text-gray-600">Not Interested</div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-teal-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-check-circle text-teal-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="csrClosedLeads">0</div>
+              <div class="text-sm text-gray-600">Lead Closed</div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-calendar-check text-indigo-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="csrMeetingSetLeads">0</div>
+              <div class="text-sm text-gray-600">Meeting Set</div>
+            </div>
+            
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-percentage text-orange-600"></i>
+              </div>
+              <div class="text-2xl font-bold text-gray-800" id="csrFollowUpRate">0%</div>
+              <div class="text-sm text-gray-600">Follow-up Completion</div>
+            </div>
+          </div>
+
+          <!-- Lead Status Distribution Chart -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="glass-card rounded-2xl p-6">
+              <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-bar text-cyan-600"></i>
+                Lead Status Distribution
+              </h3>
+              <div id="csrStatusChart" class="space-y-3">
+                <div class="flex items-center gap-3">
+                  <span class="w-24 text-sm text-gray-600">Interested</span>
+                  <div class="flex-1 bg-gray-200 rounded-full h-6">
+                    <div class="bg-green-500 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-medium" id="csrBarInterested" style="width: 0%">0</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="w-24 text-sm text-gray-600">Not Interested</span>
+                  <div class="flex-1 bg-gray-200 rounded-full h-6">
+                    <div class="bg-red-500 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-medium" id="csrBarNotInterested" style="width: 0%">0</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="w-24 text-sm text-gray-600">Follow-up</span>
+                  <div class="flex-1 bg-gray-200 rounded-full h-6">
+                    <div class="bg-yellow-500 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-medium" id="csrBarFollowUp" style="width: 0%">0</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="w-24 text-sm text-gray-600">Email Sent</span>
+                  <div class="flex-1 bg-gray-200 rounded-full h-6">
+                    <div class="bg-purple-500 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-medium" id="csrBarEmailSent" style="width: 0%">0</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="w-24 text-sm text-gray-600">Lead Closed</span>
+                  <div class="flex-1 bg-gray-200 rounded-full h-6">
+                    <div class="bg-teal-500 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-medium" id="csrBarClosed" style="width: 0%">0</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <span class="w-24 text-sm text-gray-600">Meeting Set</span>
+                  <div class="flex-1 bg-gray-200 rounded-full h-6">
+                    <div class="bg-indigo-500 h-6 rounded-full flex items-center justify-end pr-2 text-white text-xs font-medium" id="csrBarMeetingSet" style="width: 0%">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pending Follow-ups -->
+            <div class="glass-card rounded-2xl p-6">
+              <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-bell text-orange-600"></i>
+                Pending Follow-ups
+              </h3>
+              <div id="csrPendingFollowUps" class="space-y-3 max-h-64 overflow-y-auto">
+                <p class="text-gray-500 text-center py-4">No pending follow-ups</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSR All Leads Tab Content -->
+        <div id="csrLeadsContent" style="display:none;">
+          <!-- Filter Panel -->
+          <div class="glass-card rounded-2xl p-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fas fa-filter text-cyan-600"></i>
+              Filter Leads
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <input type="text" id="csrSearchInput" placeholder="Search by name, company..."
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <select id="csrStatusFilter" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300">
+                  <option value="">All Statuses</option>
+                  <option value="Interested">Interested</option>
+                  <option value="Not Interested">Not Interested</option>
+                  <option value="Follow-up">Follow-up</option>
+                  <option value="Email Sent">Email Sent</option>
+                  <option value="Lead Closed">Lead Closed</option>
+                  <option value="Meeting Set">Meeting Set</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+                <select id="csrDateFilter" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300">
+                  <option value="all">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                </select>
+              </div>
+              <div class="flex items-end">
+                <button id="csrClearFilters" class="w-full px-4 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl transition-all font-medium">
+                  <i class="fas fa-times mr-2"></i>Clear
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Leads Table -->
+          <div class="glass-card rounded-2xl p-6 overflow-x-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-list text-cyan-600"></i>
+                Leads List
+                <span class="text-sm font-normal text-gray-500" id="csrLeadsCount">(0 leads)</span>
+              </h3>
+              <button id="csrExportLeads" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-all">
+                <i class="fas fa-download mr-2"></i>Export CSV
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full min-w-[900px]">
+                <thead>
+                  <tr class="text-left border-b border-gray-200">
+                    <th class="pb-3 font-semibold text-gray-600 text-sm">Lead Name</th>
+                    <th class="pb-3 font-semibold text-gray-600 text-sm">Contact</th>
+                    <th class="pb-3 font-semibold text-gray-600 text-sm">Company</th>
+                    <th class="pb-3 font-semibold text-gray-600 text-sm">Service</th>
+                    <th class="pb-3 font-semibold text-gray-600 text-sm">Status</th>
+                    <th class="pb-3 font-semibold text-gray-600 text-sm">Date Added</th>
+                    <th class="pb-3 font-semibold text-gray-600 text-sm">Callback Time</th>
+                    <th class="pb-3 font-semibold text-gray-600 text-sm">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="csrLeadsTableBody">
+                  <tr>
+                    <td colspan="8" class="py-8 text-center text-gray-500">No leads found</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- CSR Add Lead Tab Content -->
+        <div id="csrAddLeadContent" style="display:none;">
+          <div class="glass-card rounded-2xl p-8 max-w-2xl mx-auto">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+              <i class="fas fa-user-plus text-cyan-600"></i>
+              Add New Lead
+            </h3>
+            <form id="csrLeadForm" class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-user text-cyan-600 mr-1"></i>Lead Name *
+                  </label>
+                  <input type="text" id="csrLeadName" required placeholder="Enter lead name"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-phone text-cyan-600 mr-1"></i>Contact Number *
+                  </label>
+                  <input type="tel" id="csrContactNumber" required placeholder="+1 234 567 890"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300 focus:border-transparent">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-building text-cyan-600 mr-1"></i>Company Name *
+                  </label>
+                  <input type="text" id="csrCompanyName" required placeholder="Enter company name"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-briefcase text-cyan-600 mr-1"></i>Service Interested In *
+                  </label>
+                  <input type="text" id="csrServiceInterested" required placeholder="e.g., Web Development"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300 focus:border-transparent">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-flag text-cyan-600 mr-1"></i>Lead Status *
+                  </label>
+                  <select id="csrLeadStatus" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300 focus:border-transparent">
+                    <option value="">Select Status</option>
+                    <option value="Interested">Interested</option>
+                    <option value="Not Interested">Not Interested</option>
+                    <option value="Follow-up">Follow-up</option>
+                    <option value="Email Sent">Email Sent</option>
+                    <option value="Lead Closed">Lead Closed</option>
+                    <option value="Meeting Set">Meeting Set</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-calendar text-cyan-600 mr-1"></i>Date of Contact
+                  </label>
+                  <input type="date" id="csrDateOfContact" readonly
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 cursor-not-allowed">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-user-tie text-cyan-600 mr-1"></i>Assigned CSR Name
+                  </label>
+                  <input type="text" id="csrAssignedCSR" placeholder="Optional"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300 focus:border-transparent">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-phone-alt text-cyan-600 mr-1"></i>Callback Time
+                  </label>
+                  <input type="datetime-local" id="csrCallbackTime"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300 focus:border-transparent">
+                </div>
+              </div>
+
+              <!-- Email Sent Section (appears when status is Email Sent) -->
+              <div id="csrEmailSection" class="hidden p-4 bg-purple-50 border border-purple-200 rounded-xl">
+                <h4 class="font-semibold text-purple-800 mb-3">
+                  <i class="fas fa-envelope mr-2"></i>Email Follow-up Details
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Sent Date *</label>
+                    <input type="date" id="csrEmailSentDate"
+                      class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-transparent">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Confirmed Sent?</label>
+                    <select id="csrEmailConfirmed" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300">
+                      <option value="Yes">Yes</option>
+                      <option value="No">No</option>
+                    </select>
+                  </div>
+                </div>
+                <p class="text-sm text-purple-600 mt-3">
+                  <i class="fas fa-info-circle mr-1"></i>
+                  Follow-up reminders will be set for 3, 5, 7, 9, and 11 days after email sent (excluding weekends).
+                </p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-sticky-note text-cyan-600 mr-1"></i>Notes (Optional)
+                </label>
+                <textarea id="csrLeadNotes" rows="3" placeholder="Any additional notes about the lead..."
+                  class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-cyan-300 focus:border-transparent"></textarea>
+              </div>
+
+              <div class="flex gap-4 pt-4">
+                <button type="submit" id="csrSubmitLead"
+                  class="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-6 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 font-semibold">
+                  <i class="fas fa-plus"></i>
+                  <span>Add Lead</span>
+                </button>
+                <button type="button" id="csrClearForm"
+                  class="px-6 py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold transition-all duration-200">
+                  Clear
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- CSR Monthly Report Tab Content -->
+        <div id="csrMonthlyReportContent" style="display:none;">
+          <div class="glass-card rounded-2xl p-6 mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-calendar-alt text-cyan-600"></i>
+                Select Month
+              </h3>
+              <div class="flex gap-3 flex-wrap">
+                <input type="month" id="csrReportMonth" class="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-cyan-300">
+                <button id="csrGenerateReport" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg font-medium transition-all">
+                  <i class="fas fa-sync mr-2"></i>Generate Report
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Monthly Report Stats -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="text-3xl font-bold text-gray-800" id="reportTotalLeads">0</div>
+              <div class="text-sm text-gray-600">Total Leads Added</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="text-3xl font-bold text-green-600" id="reportInterestedLeads">0</div>
+              <div class="text-sm text-gray-600">Interested</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="text-3xl font-bold text-red-600" id="reportNotInterestedLeads">0</div>
+              <div class="text-sm text-gray-600">Not Interested</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="text-3xl font-bold text-yellow-600" id="reportFollowUpLeads">0</div>
+              <div class="text-sm text-gray-600">Follow-up Required</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="text-3xl font-bold text-purple-600" id="reportEmailSentLeads">0</div>
+              <div class="text-sm text-gray-600">Email Sent</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="text-3xl font-bold text-teal-600" id="reportClosedLeads">0</div>
+              <div class="text-sm text-gray-600">Lead Closed</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="text-3xl font-bold text-indigo-600" id="reportMeetingSetLeads">0</div>
+              <div class="text-sm text-gray-600">Meeting Set</div>
+            </div>
+            <div class="glass-card rounded-2xl p-6 text-center">
+              <div class="text-3xl font-bold text-cyan-600" id="reportFollowUpCompletion">0%</div>
+              <div class="text-sm text-gray-600">Follow-up Completion</div>
+            </div>
+          </div>
+
+          <!-- Export Buttons -->
+          <div class="glass-card rounded-2xl p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fas fa-download text-cyan-600"></i>
+              Export Report
+            </h3>
+            <div class="flex flex-wrap gap-4">
+              <button id="csrExportCSV" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium transition-all flex items-center gap-2">
+                <i class="fas fa-file-csv"></i>
+                Export as CSV
+              </button>
+              <button id="csrExportPDF" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-medium transition-all flex items-center gap-2">
+                <i class="fas fa-file-pdf"></i>
+                Export as PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
     <!-- Project Modal -->
     <div id="projectModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm hidden">
@@ -1280,6 +1727,7 @@
         document.getElementById('analyticsSection').style.display = sectionId === 'analyticsSection' ? 'block' : 'none';
         document.getElementById('adminSection').style.display = sectionId === 'adminSection' ? 'block' : 'none';
         document.getElementById('dailyReportSection').style.display = sectionId === 'dailyReportSection' ? 'block' : 'none';
+        document.getElementById('csrSection').style.display = sectionId === 'csrSection' ? 'block' : 'none';
         
         // Update navigation active states
         document.querySelectorAll('.nav-item').forEach(a => a.classList.remove("sidebar-active"));
@@ -1289,6 +1737,7 @@
         if (sectionId === "analyticsSection") document.getElementById("navAnalytics").classList.add("sidebar-active");
         if (sectionId === "adminSection") document.getElementById("navAdmin").classList.add("sidebar-active");
         if (sectionId === "dailyReportSection") document.getElementById("navDailyReport").classList.add("sidebar-active");
+        if (sectionId === "csrSection") document.getElementById("navCSR").classList.add("sidebar-active");
         
         // Load admin data when admin section is shown
         if (sectionId === "adminSection") {
@@ -1301,6 +1750,13 @@
             initializeDailyReports();
           }
         }
+        
+        // Initialize CSR module when CSR section is shown
+        if (sectionId === "csrSection") {
+          if (typeof initializeCSRModule === 'function') {
+            initializeCSRModule();
+          }
+        }
       }
       document.getElementById("navDashboard").onclick = e => { e.preventDefault(); showSection("dashboardSection"); };
       document.getElementById("navProjects").onclick = e => { e.preventDefault(); showSection("projectsSection"); };
@@ -1308,6 +1764,7 @@
       document.getElementById("navAnalytics").onclick = e => { e.preventDefault(); showSection("analyticsSection"); };
       document.getElementById("navAdmin").onclick = e => { e.preventDefault(); showSection("adminSection"); };
       document.getElementById("navDailyReport").onclick = e => { e.preventDefault(); showSection("dailyReportSection"); };
+      document.getElementById("navCSR").onclick = e => { e.preventDefault(); showSection("csrSection"); };
 
       // Auth and dashboard
       auth.onAuthStateChanged(async (user) => {
@@ -2833,5 +3290,6 @@
   <!-- <script src="js/projects.js"></script> -->
   <script src="js/timer.js"></script>
   <script src="js/reports.js"></script>
+  <script src="js/csr.js"></script>
 </body>
 </html>
