@@ -1115,3 +1115,83 @@ async function loadAnalytics() {
     if (analyticsElements.completedProjectsCount) analyticsElements.completedProjectsCount.textContent = '0';
   }
 }
+
+// Ensure user role is set from Firebase authentication and Firestore
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) {
+    window.location.href = "login.html";  // Redirect to login if not logged in
+    return;
+  }
+
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  const userInfo = userDoc.data();
+
+  // Set current user role based on Firestore data
+  currentUserRole = userInfo.role;
+
+  // Show or hide the "User" section in the sidebar based on user role
+  const navUser = document.getElementById('navUser');
+  if (currentUserRole === 'admin') {
+    navUser.classList.remove('hidden');  // Show User section for admins
+  } else {
+    navUser.classList.add('hidden');  // Hide User section for non-admins
+  }
+});
+
+// Prevent the default anchor link behavior and open the modal when the "User" section is clicked
+document.getElementById('navUser').addEventListener('click', function (e) {
+  e.preventDefault();  // Prevent default anchor link behavior (i.e., prevent # in the URL)
+
+  if (currentUserRole === 'admin') {
+    // Show the modal if the user is an admin
+    document.getElementById('userModal').classList.remove('hidden');  // Show modal
+  }
+});
+
+// Close the modal when the close button (X) is clicked
+document.querySelector('.close-btn').addEventListener('click', function () {
+  closeModal();  // Hide the modal
+});
+
+// Function to close the modal
+function closeModal() {
+  document.getElementById('userModal').classList.add('hidden');
+}
+
+// Handle user creation form submission
+document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+  e.preventDefault();  // Prevent default form submission
+
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const role = document.getElementById('role').value;
+
+  // Basic form validation
+  if (!email || !password || !role) {
+    alert('Please fill all the fields.');
+    return;
+  }
+
+  if (password.length < 6) {
+    alert('Password should be at least 6 characters.');
+    return;
+  }
+
+  try {
+    // Create a new user with Firebase Authentication
+    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+
+    // Save user role in Firestore
+    await db.collection('users').doc(user.uid).set({
+      email: email,
+      role: role,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    alert("User created successfully!");
+    closeModal();  // Close the modal after user is created
+  } catch (error) {
+    alert(error.message);  // Show error message if any (e.g., duplicate email)
+  }
+});

@@ -11,6 +11,60 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
+    /* Basic modal styling */
+    #userModal {
+      display: none;
+      /* Hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      /* Semi-transparent background */
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+      width: 400px;
+    }
+
+    .close-btn {
+      float: right;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    form label {
+      display: block;
+      margin-top: 10px;
+    }
+
+    form input,
+    form select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+    }
+
+    form button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background-color: #45a049;
+    }
+
     @keyframes slideInLeft {
       from {
         opacity: 0;
@@ -185,9 +239,35 @@
           <i class="fas fa-dollar-sign w-5"></i>
           <span>Finance</span>
         </a>
+        <!-- User Section (Only visible to Admins) -->
+        <a href="#" class="nav-item hidden" id="navUser">
+          <i class="fas fa-users w-5"></i>
+          <span>User</span>
+        </a>
+
 
       </div>
     </nav>
+
+    <!-- Modal for Admin User Creation -->
+    <div id="userModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        <h2>Create New User</h2>
+        <form id="createUserForm">
+          <label for="email">Email:</label>
+          <input type="email" id="email" required />
+          <label for="password">Password:</label>
+          <input type="password" id="password" required />
+          <label for="role">Role:</label>
+          <select id="role" required>
+            <option value="member">Member</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button type="submit">Create User</button>
+        </form>
+      </div>
+    </div>
 
     <!-- User Profile Section -->
     <div class="p-6 border-t border-gray-100">
@@ -1831,24 +1911,35 @@
       document.getElementById("navCSR").onclick = e => { e.preventDefault(); showSection("csrSection"); };
       document.getElementById("navFinance").onclick = (e) => {
         e.preventDefault();
-        window.location.href = "finance.html"; 
+        window.location.href = "finance.html";
+      };
+      // Add the event listener for the "User" section here
+      document.getElementById("navUser").onclick = e => {
+        e.preventDefault(); // Prevent default behavior
+        if (currentUserRole === 'admin') {
+          document.getElementById('userModal').classList.remove('hidden'); // Show modal for admins
+        }
       };
 
 
       // Auth and dashboard
       auth.onAuthStateChanged(async (user) => {
-        if (!user) { window.location.href = "login.html"; return; }
+        if (!user) {
+          window.location.href = "login.html"; // Redirect to login page if no user is logged in
+          return;
+        }
+
         const userDoc = await db.collection('users').doc(user.uid).get();
-        const userInfo = userDoc.data();
+        const userInfo = userDoc.data(); // Get user info from Firestore
 
         // Set global variables for use in other modules
         currentUser = user;
-        currentUserRole = userInfo.role;
+        currentUserRole = userInfo.role; // Set user role (admin or member)
 
         // Update header welcome message
         document.getElementById('welcome').innerHTML = `
-          <span>Welcome back, <strong>${userInfo.email}</strong></span>
-        `;
+      <span>Welcome back, <strong>${userInfo.email}</strong></span>
+    `;
 
         // Update sidebar user info
         document.getElementById('sidebarUserEmail').textContent = userInfo.email;
@@ -1858,10 +1949,24 @@
         document.getElementById('logoutBtn').onclick = () => auth.signOut();
 
         // Show/hide admin section based on user role
+        const navUser = document.getElementById('navUser');
+        const navAdmin = document.getElementById('navAdmin');
+        const addProjectBtn = document.getElementById('addProjectBtn');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+
+        // Handle admin-specific UI elements based on role
         if (userInfo.role === 'admin') {
-          document.getElementById('navAdmin').classList.remove('hidden');
+          // Show admin elements
+          navAdmin.classList.remove('hidden');
+          navUser.classList.remove('hidden'); // Show "User" option for admin
+          addProjectBtn.style.display = 'flex'; // Show "Add Project" button for admin
+          addTaskBtn.style.display = 'flex'; // Show "Add Task" button for admin
         } else {
-          document.getElementById('navAdmin').classList.add('hidden');
+          // Hide admin elements for non-admin users
+          navAdmin.classList.add('hidden');
+          navUser.classList.add('hidden'); // Hide "User" option for non-admin
+          addProjectBtn.style.display = 'none'; // Hide "Add Project" button for non-admins
+          addTaskBtn.style.display = 'none'; // Hide "Add Task" button for non-admins
         }
 
         // Load dashboard data
@@ -1873,6 +1978,7 @@
         // Show dashboard by default
         showSection("dashboardSection");
       });
+
 
       async function loadDashboardCounts(timePeriod = 'today') {
         const projectsSnap = await db.collection('projects').get();

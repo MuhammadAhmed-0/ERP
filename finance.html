@@ -1,436 +1,567 @@
 <!-- index.html (Advanced Company Expense Manager - Firebase-ready, Login First) -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Company Expense Manager</title>
 
   <style>
- /* ===== FINAL CSS (polished UI/UX, alignment, spacing, responsive) ===== */
+    /* ===== FINAL CSS (polished UI/UX, alignment, spacing, responsive) ===== */
 
-:root{
-  --bg:#f3f4f6;
-  --card:#ffffff;
-  --text:#111827;
-  --muted:#6b7280;
-  --line:#e5e7eb;
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --line: #e5e7eb;
 
-  --primary:#2563eb;
-  --primaryHover:#1d4ed8;
+      --primary: #2563eb;
+      --primaryHover: #1d4ed8;
 
-  --danger:#dc2626;
-  --dangerHover:#b91c1c;
+      --danger: #dc2626;
+      --dangerHover: #b91c1c;
 
-  --ok:#16a34a;
-  --warn:#d97706;
+      --ok: #16a34a;
+      --warn: #d97706;
 
-  --shadow: 0 2px 12px rgba(0,0,0,.05);
-  --radius: 12px;
-  --radiusSm: 10px;
+      --shadow: 0 2px 12px rgba(0, 0, 0, .05);
+      --radius: 12px;
+      --radiusSm: 10px;
 
-  --space-1: 6px;
-  --space-2: 10px;
-  --space-3: 14px;
-  --space-4: 18px;
-}
+      --space-1: 6px;
+      --space-2: 10px;
+      --space-3: 14px;
+      --space-4: 18px;
+    }
 
-*{ box-sizing:border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-html, body{ height:100%; }
+    html,
+    body {
+      height: 100%;
+    }
 
-body{
-  margin:0;
-  font-family: Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  overflow-x:hidden;
-  line-height: 1.35;
-}
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.35;
+    }
 
-/* Container */
-.wrap{
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 16px;
-}
+    /* Container */
+    .wrap {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px;
+    }
 
-/* Helpers */
-.row{ display:flex; gap:12px; flex-wrap:wrap; }
-.between{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    /* Helpers */
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-.hint{
-  font-size: 12px;
-  color: var(--muted);
-}
+    .between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-/* Header */
-header{
-  background: var(--card);
-  border-bottom:1px solid var(--line);
-  position: sticky;
-  top:0;
-  z-index:10;
-  display:none; /* controlled by JS */
-}
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+    }
 
-.brand{ display:flex; align-items:center; gap:10px; }
-.logo{
-  width:36px; height:36px;
-  border-radius: 10px;
-  background: var(--primary);
-  display:inline-block;
-}
-h1{ margin:0; font-size:18px; font-weight:800; }
-.sub{ color: var(--muted); font-size:12px; margin-top:2px; }
+    /* Header */
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: none;
+      /* controlled by JS */
+    }
 
-/* Badge */
-.badge{
-  display:inline-flex;
-  padding:6px 10px;
-  font-size:12px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  color: var(--muted);
-  background:#fafafa;
-  gap:8px;
-  align-items:center;
-  white-space: nowrap;
-}
-.dot{ width:8px; height:8px; border-radius:999px; display:inline-block; }
-.dot.ok{ background: var(--ok); }
-.dot.warn{ background: var(--warn); }
-.dot.danger{ background: var(--danger); }
-.dot.primary{ background: var(--primary); }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-/* Buttons */
-.btn{
-  padding:10px 14px;
-  border-radius: 10px;
-  border:1px solid var(--line);
-  background: var(--card);
-  cursor:pointer;
-  font-weight:700;
-  font-size: 13px;
-  line-height: 1;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  transition: background .15s ease, border-color .15s ease, transform .05s ease;
-}
-.btn:hover{ transform: translateY(-1px); }
-.btn:active{ transform: translateY(0px); }
-.btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+    .logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--primary);
+      display: inline-block;
+    }
 
-.btn.primary{
-  background: var(--primary);
-  border-color: var(--primary);
-  color:white;
-  margin-top: 12px;
-}
-.btn.primary:hover{
-  background: var(--primaryHover);
-  border-color: var(--primaryHover);
-}
-.btn.danger{
-  background: var(--danger);
-  border-color: var(--danger);
-  color:white;
-}
-.btn.danger:hover{
-  background: var(--dangerHover);
-  border-color: var(--dangerHover);
-}
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
 
-/* Form inputs */
-label{
-  font-size:12px;
-  color: var(--muted);
-  font-weight: 800;
-}
+    .sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
 
-.field{ display:grid; gap:6px; }
+    /* Badge */
+    .badge {
+      display: inline-flex;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #fafafa;
+      gap: 8px;
+      align-items: center;
+      white-space: nowrap;
+    }
 
-input, select, textarea{
-  width:100%;
-  padding:10px 12px;
-  border-radius: 10px;
-  border:1px solid var(--line);
-  background:white;
-  outline:none;
-  font-size:14px;
-  transition: border-color .15s ease, box-shadow .15s ease;
-}
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      display: inline-block;
+    }
 
-input:focus, select:focus, textarea:focus{
-  border-color: rgba(37,99,235,.55);
-  box-shadow: 0 0 0 4px rgba(37,99,235,.12);
-}
+    .dot.ok {
+      background: var(--ok);
+    }
 
-textarea{
-  min-height: 90px;
-  resize: vertical;
-}
+    .dot.warn {
+      background: var(--warn);
+    }
 
-/* Make file input look cleaner */
-input[type="file"]{
-  padding: 8px;
-}
+    .dot.danger {
+      background: var(--danger);
+    }
 
-/* Grid for forms */
-.cols2{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-@media (max-width: 700px){
-  .cols2{ grid-template-columns: 1fr; }
-}
+    .dot.primary {
+      background: var(--primary);
+    }
 
-/* Cards */
-main{ padding: 18px 0; }
+    /* Buttons */
+    .btn {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .15s ease, border-color .15s ease, transform .05s ease;
+    }
 
-.card{
-  background: var(--card);
-  border:1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
+    .btn:hover {
+      transform: translateY(-1px);
+    }
 
-.card .head{
-  padding: 14px 16px 0 16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:12px;
-  flex-wrap:wrap;
-}
+    .btn:active {
+      transform: translateY(0px);
+    }
 
-.card .title{
-  margin:0;
-  font-size: 15px;
-  font-weight: 900;
-}
+    .btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
 
-.card .body{ padding: 14px 16px 16px 16px; }
+    .btn.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+      margin-top: 12px;
+    }
 
-.card .foot{
-  padding: 12px 16px;
-  border-top:1px solid var(--line);
-  display:flex;
-  justify-content:space-between;
-  gap: 12px;
-  flex-wrap:wrap;
-  align-items:center;
-}
+    .btn.primary:hover {
+      background: var(--primaryHover);
+      border-color: var(--primaryHover);
+    }
 
-/* Divider */
-.divider{
-  height:1px;
-  background: var(--line);
-  margin: 12px 0;
-}
+    .btn.danger {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: white;
+    }
 
-/* Dashboard Stats */
-.stats{
-  display:grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-}
-@media (max-width: 1100px){
-  .stats{ grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 600px){
-  .stats{ grid-template-columns: 1fr; }
-}
+    .btn.danger:hover {
+      background: var(--dangerHover);
+      border-color: var(--dangerHover);
+    }
 
-.stat{
-  padding: 14px 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
+    /* Form inputs */
+    label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+    }
 
-.stat .k{
-  color: var(--muted);
-  font-size: 12px;
-  margin-bottom: 6px;
-  font-weight: 800;
-}
+    .field {
+      display: grid;
+      gap: 6px;
+    }
 
-.stat .v{
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: .2px;
-}
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: white;
+      outline: none;
+      font-size: 14px;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
 
-/* ===== LAYOUT: stack Accounts + Add Tx BEFORE Transactions table (single column) ===== */
-.grid{
-  display:grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  align-items: start;
-}
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(37, 99, 235, .55);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
+    }
 
-/* Put aside first */
-.grid > aside{
-  grid-column: 1;
-  grid-row: 1;
-  position: static; /* not sticky in this layout */
-  align-self: start;
-}
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
 
-/* Put transactions card second */
-.grid > .card{
-  grid-column: 1;
-  grid-row: 2;
-}
+    /* Make file input look cleaner */
+    input[type="file"] {
+      padding: 8px;
+    }
 
-/* Right side cards spacing (aside) */
-.grid > aside{
-  display:flex;
-  flex-direction: column;
-  gap: 16px;
-}
+    /* Grid for forms */
+    .cols2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
 
-/* Make nested cards (filters block) visually lighter */
-.card .card{
-  box-shadow: none;
-  border-radius: 12px;
-  background: #fbfbfb;
-}
-.card .card .body{ padding: 12px 14px; }
+    @media (max-width: 700px) {
+      .cols2 {
+        grid-template-columns: 1fr;
+      }
+    }
 
-/* Table */
-.table-wrap{
-  overflow-x:auto;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: white;
-}
+    /* Cards */
+    main {
+      padding: 18px 0;
+    }
 
-/* Ensure only table scrolls, not whole page */
-table{
-  width:100%;
-  border-collapse: collapse;
-  min-width: 1100px;
-}
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
 
-th, td{
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  font-size: 13px;
-  white-space: nowrap;
-  vertical-align: middle;
-}
+    .card .head {
+      padding: 14px 16px 0 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-th{
-  background: #f9fafb;
-  color: #374151;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: .03em;
-  font-weight: 900;
-}
+    .card .title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 900;
+    }
 
-tr:hover td{ background: #fcfcff; }
+    .card .body {
+      padding: 14px 16px 16px 16px;
+    }
 
-.td-actions{ display:flex; gap: 10px; flex-wrap: wrap; }
+    .card .foot {
+      padding: 12px 16px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
 
-/* Table action buttons */
-.link-btn{
-  border:none;
-  background: transparent;
-  cursor:pointer;
-  color: var(--primary);
-  font-weight: 900;
-  padding: 0;
-  font-size: 13px;
-}
-.link-btn:hover{ text-decoration: underline; }
-.link-btn.del{ color: var(--danger); }
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: var(--line);
+      margin: 12px 0;
+    }
 
-/* Amount colors */
-.amount.in{ color: var(--ok); font-weight: 900; }
-.amount.out{ color: var(--danger); font-weight: 900; }
+    /* Dashboard Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
 
-/* Footer buttons alignment consistency */
-.card .foot .row{
-  margin-left:auto;
-}
+    @media (max-width: 1100px) {
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
 
-/* Login Screen */
-#login-screen{
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 18px;
-}
+    @media (max-width: 600px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
 
-.login-card{
-  width: min(520px, 100%);
-  padding: 16px;
-  border-radius: 16px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  box-shadow: 0 12px 34px rgba(0,0,0,.08);
-}
+    .stat {
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
 
-.login-top{
-  display:flex;
-  align-items:center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
+    .stat .k {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
 
-.login-title{
-  margin:0;
-  font-size: 18px;
-  font-weight: 900;
-}
+    .stat .v {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
 
-.login-sub{
-  margin: 2px 0 0 0;
-  color: var(--muted);
-  font-size: 12px;
-}
+    /* ===== LAYOUT: stack Accounts + Add Tx BEFORE Transactions table (single column) ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      align-items: start;
+    }
 
-/* App screen hidden until login */
-#app-screen{ display:none; }
+    /* Put aside first */
+    .grid>aside {
+      grid-column: 1;
+      grid-row: 1;
+      position: static;
+      /* not sticky in this layout */
+      align-self: start;
+    }
 
-/* Toast */
-.toast{
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  background: #111827;
-  color: white;
-  padding: 12px 14px;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.2);
-  display:none;
-  max-width: 360px;
-  font-size: 13px;
-  z-index: 999;
-}
+    /* Put transactions card second */
+    .grid>.card {
+      grid-column: 1;
+      grid-row: 2;
+    }
 
-/* Small-screen polishing */
-@media (max-width: 520px){
-  .wrap{ padding: 12px; }
-  .card .body{ padding: 12px 12px 14px 12px; }
-  .card .head{ padding: 12px 12px 0 12px; }
-  .card .foot{ padding: 12px; }
-  .btn{ width: 100%; justify-content: center; }
-  header .row{ width: 100%; }
-  .badge{ width: 100%; justify-content: center; }
-}
+    /* Right side cards spacing (aside) */
+    .grid>aside {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
 
- 
- 
- </style>
+    /* Make nested cards (filters block) visually lighter */
+    .card .card {
+      box-shadow: none;
+      border-radius: 12px;
+      background: #fbfbfb;
+    }
+
+    .card .card .body {
+      padding: 12px 14px;
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: white;
+    }
+
+    /* Ensure only table scrolls, not whole page */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1100px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 13px;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f9fafb;
+      color: #374151;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      font-weight: 900;
+    }
+
+    tr:hover td {
+      background: #fcfcff;
+    }
+
+    .td-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Table action buttons */
+    .link-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--primary);
+      font-weight: 900;
+      padding: 0;
+      font-size: 13px;
+    }
+
+    .link-btn:hover {
+      text-decoration: underline;
+    }
+
+    .link-btn.del {
+      color: var(--danger);
+    }
+
+    /* Amount colors */
+    .amount.in {
+      color: var(--ok);
+      font-weight: 900;
+    }
+
+    .amount.out {
+      color: var(--danger);
+      font-weight: 900;
+    }
+
+    /* Footer buttons alignment consistency */
+    .card .foot .row {
+      margin-left: auto;
+    }
+
+    /* Login Screen */
+    #login-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .login-card {
+      width: min(520px, 100%);
+      padding: 16px;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 12px 34px rgba(0, 0, 0, .08);
+    }
+
+    .login-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .login-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .login-sub {
+      margin: 2px 0 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* App screen hidden until login */
+    #app-screen {
+      display: none;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: #111827;
+      color: white;
+      padding: 12px 14px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .2);
+      display: none;
+      max-width: 360px;
+      font-size: 13px;
+      z-index: 999;
+    }
+
+    /* Small-screen polishing */
+    @media (max-width: 520px) {
+      .wrap {
+        padding: 12px;
+      }
+
+      .card .body {
+        padding: 12px 12px 14px 12px;
+      }
+
+      .card .head {
+        padding: 12px 12px 0 12px;
+      }
+
+      .card .foot {
+        padding: 12px;
+      }
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      header .row {
+        width: 100%;
+      }
+
+      .badge {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -460,6 +591,10 @@ tr:hover td{ background: #fcfcff; }
 
       <div class="row" style="margin-top:12px;">
         <button class="btn primary" id="btn-login" type="button">Login</button>
+        <button onclick="window.location.href='https://erp-empire.pages.dev/'" type="button"
+          style="padding:10px 14px; border-radius:10px; border:1px solid #e5e7eb; background:#2563eb; color:#ffffff; font-weight:700; font-size:13px; cursor:pointer; margin-top: 10px;">
+          Go Back
+        </button>
         <!-- <button class="btn" id="btn-signup" type="button">Create Account</button> -->
       </div>
     </div>
@@ -477,6 +612,18 @@ tr:hover td{ background: #fcfcff; }
       </div>
 
       <div class="row">
+        <button onclick="window.location.href='https://erp-empire.pages.dev/'" style="
+      padding:10px 14px;
+      border-radius:10px;
+      border:1px solid #e5e7eb;
+      background:#2563eb;
+      color:#ffffff;
+      font-weight:700;
+      font-size:13px;
+      cursor:pointer;
+    ">
+          Dashboard
+        </button>
         <span class="badge" id="auth-status">
           <span class="dot ok"></span>
           <span>Signed in</span>
@@ -597,7 +744,8 @@ tr:hover td{ background: #fcfcff; }
 
                   <div class="field" style="min-width:240px; flex:2;">
                     <label for="filter-search">Search</label>
-                    <input id="filter-search" type="text" placeholder="Search vendor, description, reference, project..." />
+                    <input id="filter-search" type="text"
+                      placeholder="Search vendor, description, reference, project..." />
                   </div>
                 </div>
 
@@ -894,613 +1042,613 @@ tr:hover td{ background: #fcfcff; }
 
   <div class="toast" id="toast"></div>
 
-<script type="module">
-  /***********************
-   * 1) FIREBASE IMPORTS
-   ***********************/
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  <script type="module">
+    /***********************
+     * 1) FIREBASE IMPORTS
+     ***********************/
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-  import {
-    getFirestore,
-    collection,
-    doc,
-    addDoc,
-    setDoc,
-    updateDoc,
-    deleteDoc,
-    onSnapshot,
-    query,
-    orderBy,
-    getDocs,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import {
+      getFirestore,
+      collection,
+      doc,
+      addDoc,
+      setDoc,
+      updateDoc,
+      deleteDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      getDocs,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-  import {
-    getStorage,
-    ref,
-    uploadBytes,
-    getDownloadURL
-  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
-
-
-  /***********************
-   * 2) YOUR FIREBASE CONFIG (REPLACE THIS)
-   ***********************/
-  const firebaseConfig = {
-    apiKey: "AIzaSyD4aov8z_-gvtg2CWRS6ZXUQGPrCkRXB8Y",
-    authDomain: "finance-b2661.firebaseapp.com",
-    projectId: "finance-b2661",
-    storageBucket: "finance-b2661.firebasestorage.app",
-    messagingSenderId: "610582222318",
-    appId: "1:610582222318:web:5422f03cc691633435aaff"
-  };
+    import {
+      getStorage,
+      ref,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
 
-  /***********************
-   * 3) INIT
-   ***********************/
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
-
-
-  /***********************
-   * 4) UI ELEMENTS
-   ***********************/
-  // Screens
-  const loginScreen = document.getElementById("login-screen");
-  const appScreen = document.getElementById("app-screen");
-  const appHeader = document.getElementById("app-header");
-
-  // Auth UI
-  const authEmail = document.getElementById("auth-email");
-  const authPass = document.getElementById("auth-pass");
-  const btnLogin = document.getElementById("btn-login");
-  const btnSignup = document.getElementById("btn-signup");
-  const btnLogout = document.getElementById("btn-logout");
-  const authStatus = document.getElementById("auth-status");
-
-  // Buttons
-  const btnExportCsv = document.getElementById("btn-export-csv");
-  const btnRefresh = document.getElementById("btn-refresh");
-  const btnClearAll = document.getElementById("btn-clear-all");
-
-  // Accounts
-  const accountForm = document.getElementById("account-form");
-  const accName = document.getElementById("acc-name");
-  const accCurrency = document.getElementById("acc-currency");
-  const accOpening = document.getElementById("acc-opening");
-  const btnAddAccount = document.getElementById("btn-add-account");
-  const accountsList = document.getElementById("accounts-list");
-  const accountsCount = document.getElementById("accounts-count");
-
-  // Transactions
-  const txForm = document.getElementById("tx-form");
-  const txId = document.getElementById("tx-id");
-  const txType = document.getElementById("tx-type");
-  const txDate = document.getElementById("tx-date");
-  const txAmount = document.getElementById("tx-amount");
-  const txCurrency = document.getElementById("tx-currency");
-  const txAccount = document.getElementById("tx-account");
-  const txPayment = document.getElementById("tx-payment");
-  const txRate = document.getElementById("tx-rate");
-  const txCategory = document.getElementById("tx-category");
-  const txDept = document.getElementById("tx-dept");
-  const txCategoryOtherWrap = document.getElementById("other-category-wrap");
-  const txCategoryOther = document.getElementById("tx-category-other");
-  const txProject = document.getElementById("tx-project");
-  const txVendor = document.getElementById("tx-vendor");
-  const txRef = document.getElementById("tx-ref");
-  const txDescShort = document.getElementById("tx-desc-short");
-  const txDesc = document.getElementById("tx-desc");
-  const txReceipt = document.getElementById("tx-receipt");
-
-  const btnSaveTx = document.getElementById("btn-save-tx");
-  const btnCancelEdit = document.getElementById("btn-cancel-edit");
-  const modeBadge = document.getElementById("mode-badge");
-
-  // Table
-  const txList = document.getElementById("tx-list");
-  const countLabel = document.getElementById("count-label");
-
-  // Filters
-  const filterType = document.getElementById("filter-type");
-  const filterCurrency = document.getElementById("filter-currency");
-  const filterAccount = document.getElementById("filter-account");
-  const filterCategory = document.getElementById("filter-category");
-  const filterDepartment = document.getElementById("filter-department");
-  const filterSearch = document.getElementById("filter-search");
-  const filterFrom = document.getElementById("filter-from");
-  const filterTo = document.getElementById("filter-to");
-
-  // Stats
-  const statCashIn = document.getElementById("stat-cash-in");
-  const statCashOut = document.getElementById("stat-cash-out");
-  const statNet = document.getElementById("stat-net");
-  const statReserves = document.getElementById("stat-reserves");
-
-  // Toast
-  const toastEl = document.getElementById("toast");
-  function toast(msg) {
-    toastEl.textContent = msg;
-    toastEl.style.display = "block";
-    clearTimeout(window.__toastT);
-    window.__toastT = setTimeout(() => toastEl.style.display = "none", 2500);
-  }
-
-
-  /***********************
-   * 5) STATE
-   ***********************/
-  let currentUser = null;
-  let accounts = [];      // local cache
-  let transactions = [];  // local cache
-  let unsubAccounts = null;
-  let unsubTx = null;
-
-
-  /***********************
-   * 6) HELPERS
-   ***********************/
-  function setAppEnabled(enabled) {
-    btnLogout.disabled = !enabled;
-    btnExportCsv.disabled = !enabled;
-    btnRefresh.disabled = !enabled;
-    btnClearAll.disabled = !enabled;
-
-    btnAddAccount.disabled = !enabled;
-    btnSaveTx.disabled = !enabled;
-    btnCancelEdit.disabled = !enabled;
-  }
-
-  function showLogin() {
-    loginScreen.style.display = "grid";
-    appScreen.style.display = "none";
-    appHeader.style.display = "none";
-    setAppEnabled(false);
-  }
-
-  function showApp() {
-    loginScreen.style.display = "none";
-    appScreen.style.display = "block";
-    appHeader.style.display = "block";
-    setAppEnabled(true);
-  }
-
-  function moneyFmt(amount, currency) {
-    const n = Number(amount || 0);
-    // simple formatting (no Intl to keep predictable)
-    return `${currency} ${n.toFixed(2)}`;
-  }
-
-  function normalizeText(s) {
-    return String(s || "").toLowerCase().trim();
-  }
-
-  function parseDateInput(val) {
-    // "YYYY-MM-DD"
-    if (!val) return null;
-    const d = new Date(val + "T00:00:00");
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  function txCategoryFinal() {
-    if (txCategory.value === "Other") {
-      return txCategoryOther.value.trim();
-    }
-    return txCategory.value;
-  }
-
-  function handleOtherCategoryUI() {
-    if (txCategory.value === "Other") {
-      txCategoryOtherWrap.style.display = "grid";
-      txCategoryOther.required = true;
-    } else {
-      txCategoryOtherWrap.style.display = "none";
-      txCategoryOther.required = false;
-      txCategoryOther.value = "";
-    }
-  }
-
-  txCategory.addEventListener("change", handleOtherCategoryUI);
-
-
-  /***********************
-   * 7) FIRESTORE PATHS (per-user)
-   * NOTE: For a real company, later we can move to:
-   * companies/{companyId}/accounts, companies/{companyId}/transactions
-   ***********************/
-  function accountsColRef(uid) {
-    return collection(db, "users", uid, "accounts");
-  }
-  function txColRef(uid) {
-    return collection(db, "users", uid, "transactions");
-  }
-
-
-  /***********************
-   * 8) AUTH (LOGIN / SIGNUP / LOGOUT)
-   ***********************/
-if (btnSignup) {
-  btnSignup.addEventListener("click", async () => {
-    const email = authEmail.value.trim();
-    const pass = authPass.value;
-    if (!email || !pass) return toast("Enter email and password.");
-
-    try {
-      await createUserWithEmailAndPassword(auth, email, pass);
-      toast("Account created. Logged in.");
-    } catch (err) {
-      toast(err.message);
-    }
-  });
-}
-
-  btnLogin.addEventListener("click", async () => {
-    const email = authEmail.value.trim();
-    const pass = authPass.value;
-    if (!email || !pass) return toast("Enter email and password.");
-
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-      toast("Logged in.");
-    } catch (err) {
-      toast(err.message);
-    }
-  });
-
-  btnLogout.addEventListener("click", async () => {
-    try {
-      await signOut(auth);
-      toast("Logged out.");
-    } catch (err) {
-      toast(err.message);
-    }
-  });
-
-  onAuthStateChanged(auth, (user) => {
-    // cleanup old listeners
-    if (unsubAccounts) { unsubAccounts(); unsubAccounts = null; }
-    if (unsubTx) { unsubTx(); unsubTx = null; }
-
-    accounts = [];
-    transactions = [];
-    currentUser = user;
-
-    if (!user) {
-      authStatus.innerHTML = `<span class="dot warn"></span><span>Not signed in</span>`;
-      showLogin();
-      clearUI();
-      return;
-    }
-
-    authStatus.innerHTML = `<span class="dot ok"></span><span>${user.email || "Signed in"}</span>`;
-    showApp();
-
-    // start realtime listeners
-    startAccountsListener(user.uid);
-    startTransactionsListener(user.uid);
-  });
-
-
-  /***********************
-   * 9) REALTIME LISTENERS
-   ***********************/
-  function startAccountsListener(uid) {
-    const q = query(accountsColRef(uid), orderBy("createdAt", "asc"));
-    unsubAccounts = onSnapshot(q, (snap) => {
-      accounts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderAccounts();
-      refreshAccountDropdowns();
-      recalcAndRender(); // stats may change because reserves depend on opening balances
-    });
-  }
-
-  function startTransactionsListener(uid) {
-    const q = query(txColRef(uid), orderBy("date", "desc"));
-    unsubTx = onSnapshot(q, (snap) => {
-      transactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      recalcAndRender();
-    });
-  }
-
-
-  /***********************
-   * 10) ACCOUNTS CRUD
-   ***********************/
-  accountForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!currentUser) return toast("Please login first.");
-
-    const name = accName.value.trim();
-    const currency = accCurrency.value;
-    const opening = Number(accOpening.value);
-
-    if (!name) return toast("Account name is required.");
-    if (!currency) return toast("Account currency is required.");
-    if (Number.isNaN(opening)) return toast("Opening balance must be a number.");
-
-    try {
-      await addDoc(accountsColRef(currentUser.uid), {
-        name,
-        currency,
-        openingBalance: opening,
-        createdAt: serverTimestamp()
-      });
-      accountForm.reset();
-      accCurrency.value = "PKR";
-      toast("Account added.");
-    } catch (err) {
-      toast(err.message);
-    }
-  });
-
-  async function deleteAccount(accountId) {
-    if (!currentUser) return;
-    // Safety: prevent delete if there are transactions using it
-    const hasTx = transactions.some(t => t.accountId === accountId);
-    if (hasTx) return toast("Cannot delete. This account has transactions.");
-
-    try {
-      await deleteDoc(doc(db, "users", currentUser.uid, "accounts", accountId));
-      toast("Account deleted.");
-    } catch (err) {
-      toast(err.message);
-    }
-  }
-
-
-  /***********************
-   * 11) TRANSACTIONS CRUD + RECEIPT UPLOAD
-   ***********************/
-  txForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (!currentUser) return toast("Please login first.");
-
-    handleOtherCategoryUI();
-
-    // validate Other category text
-    if (txCategory.value === "Other" && !txCategoryOther.value.trim()) {
-      return toast("Please type the Other category.");
-    }
-
-    const dateStr = txDate.value;
-    const amount = Number(txAmount.value);
-    const currency = txCurrency.value;
-    const accountId = txAccount.value;
-
-    const account = accounts.find(a => a.id === accountId);
-    if (!account) return toast("Please select a valid account.");
-
-    // IMPORTANT: enforce account currency matches transaction currency
-    if (account.currency !== currency) {
-      return toast(`Currency mismatch. Account is ${account.currency} but transaction is ${currency}.`);
-    }
-
-    if (!dateStr) return toast("Date is required.");
-    if (Number.isNaN(amount) || amount <= 0) return toast("Amount must be greater than 0.");
-
-    const data = {
-      type: txType.value, // IN / OUT
-      date: dateStr,      // store as YYYY-MM-DD for easy filtering
-      amount,
-      currency,
-      accountId,
-      accountName: account.name, // denormalize for easy table display
-      category: txCategoryFinal(),
-      department: txDept.value,
-      project: txProject.value.trim(),
-      vendor: txVendor.value.trim(),
-      payment: txPayment.value,
-      reference: txRef.value.trim(),
-      title: txDescShort.value.trim(),
-      notes: txDesc.value.trim(),
-      exchangeRate: txRate.value ? Number(txRate.value) : null,
-      updatedAt: serverTimestamp()
+    /***********************
+     * 2) YOUR FIREBASE CONFIG (REPLACE THIS)
+     ***********************/
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4aov8z_-gvtg2CWRS6ZXUQGPrCkRXB8Y",
+      authDomain: "finance-b2661.firebaseapp.com",
+      projectId: "finance-b2661",
+      storageBucket: "finance-b2661.firebasestorage.app",
+      messagingSenderId: "610582222318",
+      appId: "1:610582222318:web:5422f03cc691633435aaff"
     };
 
-    // Receipt upload (optional)
-    const file = txReceipt.files && txReceipt.files[0] ? txReceipt.files[0] : null;
 
-    try {
-      btnSaveTx.disabled = true;
+    /***********************
+     * 3) INIT
+     ***********************/
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-      // If editing
-      if (txId.value) {
-        let receiptUrl = null;
 
-        if (file) {
-          receiptUrl = await uploadReceiptAndGetUrl(currentUser.uid, txId.value, file);
-        }
+    /***********************
+     * 4) UI ELEMENTS
+     ***********************/
+    // Screens
+    const loginScreen = document.getElementById("login-screen");
+    const appScreen = document.getElementById("app-screen");
+    const appHeader = document.getElementById("app-header");
 
-        const patch = { ...data };
-        if (receiptUrl) patch.receiptUrl = receiptUrl;
+    // Auth UI
+    const authEmail = document.getElementById("auth-email");
+    const authPass = document.getElementById("auth-pass");
+    const btnLogin = document.getElementById("btn-login");
+    const btnSignup = document.getElementById("btn-signup");
+    const btnLogout = document.getElementById("btn-logout");
+    const authStatus = document.getElementById("auth-status");
 
-        await updateDoc(doc(db, "users", currentUser.uid, "transactions", txId.value), patch);
-        toast("Transaction updated.");
-        resetTxForm();
+    // Buttons
+    const btnExportCsv = document.getElementById("btn-export-csv");
+    const btnRefresh = document.getElementById("btn-refresh");
+    const btnClearAll = document.getElementById("btn-clear-all");
+
+    // Accounts
+    const accountForm = document.getElementById("account-form");
+    const accName = document.getElementById("acc-name");
+    const accCurrency = document.getElementById("acc-currency");
+    const accOpening = document.getElementById("acc-opening");
+    const btnAddAccount = document.getElementById("btn-add-account");
+    const accountsList = document.getElementById("accounts-list");
+    const accountsCount = document.getElementById("accounts-count");
+
+    // Transactions
+    const txForm = document.getElementById("tx-form");
+    const txId = document.getElementById("tx-id");
+    const txType = document.getElementById("tx-type");
+    const txDate = document.getElementById("tx-date");
+    const txAmount = document.getElementById("tx-amount");
+    const txCurrency = document.getElementById("tx-currency");
+    const txAccount = document.getElementById("tx-account");
+    const txPayment = document.getElementById("tx-payment");
+    const txRate = document.getElementById("tx-rate");
+    const txCategory = document.getElementById("tx-category");
+    const txDept = document.getElementById("tx-dept");
+    const txCategoryOtherWrap = document.getElementById("other-category-wrap");
+    const txCategoryOther = document.getElementById("tx-category-other");
+    const txProject = document.getElementById("tx-project");
+    const txVendor = document.getElementById("tx-vendor");
+    const txRef = document.getElementById("tx-ref");
+    const txDescShort = document.getElementById("tx-desc-short");
+    const txDesc = document.getElementById("tx-desc");
+    const txReceipt = document.getElementById("tx-receipt");
+
+    const btnSaveTx = document.getElementById("btn-save-tx");
+    const btnCancelEdit = document.getElementById("btn-cancel-edit");
+    const modeBadge = document.getElementById("mode-badge");
+
+    // Table
+    const txList = document.getElementById("tx-list");
+    const countLabel = document.getElementById("count-label");
+
+    // Filters
+    const filterType = document.getElementById("filter-type");
+    const filterCurrency = document.getElementById("filter-currency");
+    const filterAccount = document.getElementById("filter-account");
+    const filterCategory = document.getElementById("filter-category");
+    const filterDepartment = document.getElementById("filter-department");
+    const filterSearch = document.getElementById("filter-search");
+    const filterFrom = document.getElementById("filter-from");
+    const filterTo = document.getElementById("filter-to");
+
+    // Stats
+    const statCashIn = document.getElementById("stat-cash-in");
+    const statCashOut = document.getElementById("stat-cash-out");
+    const statNet = document.getElementById("stat-net");
+    const statReserves = document.getElementById("stat-reserves");
+
+    // Toast
+    const toastEl = document.getElementById("toast");
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.style.display = "block";
+      clearTimeout(window.__toastT);
+      window.__toastT = setTimeout(() => toastEl.style.display = "none", 2500);
+    }
+
+
+    /***********************
+     * 5) STATE
+     ***********************/
+    let currentUser = null;
+    let accounts = [];      // local cache
+    let transactions = [];  // local cache
+    let unsubAccounts = null;
+    let unsubTx = null;
+
+
+    /***********************
+     * 6) HELPERS
+     ***********************/
+    function setAppEnabled(enabled) {
+      btnLogout.disabled = !enabled;
+      btnExportCsv.disabled = !enabled;
+      btnRefresh.disabled = !enabled;
+      btnClearAll.disabled = !enabled;
+
+      btnAddAccount.disabled = !enabled;
+      btnSaveTx.disabled = !enabled;
+      btnCancelEdit.disabled = !enabled;
+    }
+
+    function showLogin() {
+      loginScreen.style.display = "grid";
+      appScreen.style.display = "none";
+      appHeader.style.display = "none";
+      setAppEnabled(false);
+    }
+
+    function showApp() {
+      loginScreen.style.display = "none";
+      appScreen.style.display = "block";
+      appHeader.style.display = "block";
+      setAppEnabled(true);
+    }
+
+    function moneyFmt(amount, currency) {
+      const n = Number(amount || 0);
+      // simple formatting (no Intl to keep predictable)
+      return `${currency} ${n.toFixed(2)}`;
+    }
+
+    function normalizeText(s) {
+      return String(s || "").toLowerCase().trim();
+    }
+
+    function parseDateInput(val) {
+      // "YYYY-MM-DD"
+      if (!val) return null;
+      const d = new Date(val + "T00:00:00");
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function txCategoryFinal() {
+      if (txCategory.value === "Other") {
+        return txCategoryOther.value.trim();
+      }
+      return txCategory.value;
+    }
+
+    function handleOtherCategoryUI() {
+      if (txCategory.value === "Other") {
+        txCategoryOtherWrap.style.display = "grid";
+        txCategoryOther.required = true;
       } else {
-        // Adding new
-        const docRef = await addDoc(txColRef(currentUser.uid), {
-          ...data,
+        txCategoryOtherWrap.style.display = "none";
+        txCategoryOther.required = false;
+        txCategoryOther.value = "";
+      }
+    }
+
+    txCategory.addEventListener("change", handleOtherCategoryUI);
+
+
+    /***********************
+     * 7) FIRESTORE PATHS (per-user)
+     * NOTE: For a real company, later we can move to:
+     * companies/{companyId}/accounts, companies/{companyId}/transactions
+     ***********************/
+    function accountsColRef(uid) {
+      return collection(db, "users", uid, "accounts");
+    }
+    function txColRef(uid) {
+      return collection(db, "users", uid, "transactions");
+    }
+
+
+    /***********************
+     * 8) AUTH (LOGIN / SIGNUP / LOGOUT)
+     ***********************/
+    if (btnSignup) {
+      btnSignup.addEventListener("click", async () => {
+        const email = authEmail.value.trim();
+        const pass = authPass.value;
+        if (!email || !pass) return toast("Enter email and password.");
+
+        try {
+          await createUserWithEmailAndPassword(auth, email, pass);
+          toast("Account created. Logged in.");
+        } catch (err) {
+          toast(err.message);
+        }
+      });
+    }
+
+    btnLogin.addEventListener("click", async () => {
+      const email = authEmail.value.trim();
+      const pass = authPass.value;
+      if (!email || !pass) return toast("Enter email and password.");
+
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        toast("Logged in.");
+      } catch (err) {
+        toast(err.message);
+      }
+    });
+
+    btnLogout.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        toast("Logged out.");
+      } catch (err) {
+        toast(err.message);
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      // cleanup old listeners
+      if (unsubAccounts) { unsubAccounts(); unsubAccounts = null; }
+      if (unsubTx) { unsubTx(); unsubTx = null; }
+
+      accounts = [];
+      transactions = [];
+      currentUser = user;
+
+      if (!user) {
+        authStatus.innerHTML = `<span class="dot warn"></span><span>Not signed in</span>`;
+        showLogin();
+        clearUI();
+        return;
+      }
+
+      authStatus.innerHTML = `<span class="dot ok"></span><span>${user.email || "Signed in"}</span>`;
+      showApp();
+
+      // start realtime listeners
+      startAccountsListener(user.uid);
+      startTransactionsListener(user.uid);
+    });
+
+
+    /***********************
+     * 9) REALTIME LISTENERS
+     ***********************/
+    function startAccountsListener(uid) {
+      const q = query(accountsColRef(uid), orderBy("createdAt", "asc"));
+      unsubAccounts = onSnapshot(q, (snap) => {
+        accounts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderAccounts();
+        refreshAccountDropdowns();
+        recalcAndRender(); // stats may change because reserves depend on opening balances
+      });
+    }
+
+    function startTransactionsListener(uid) {
+      const q = query(txColRef(uid), orderBy("date", "desc"));
+      unsubTx = onSnapshot(q, (snap) => {
+        transactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        recalcAndRender();
+      });
+    }
+
+
+    /***********************
+     * 10) ACCOUNTS CRUD
+     ***********************/
+    accountForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return toast("Please login first.");
+
+      const name = accName.value.trim();
+      const currency = accCurrency.value;
+      const opening = Number(accOpening.value);
+
+      if (!name) return toast("Account name is required.");
+      if (!currency) return toast("Account currency is required.");
+      if (Number.isNaN(opening)) return toast("Opening balance must be a number.");
+
+      try {
+        await addDoc(accountsColRef(currentUser.uid), {
+          name,
+          currency,
+          openingBalance: opening,
           createdAt: serverTimestamp()
         });
-
-        if (file) {
-          const receiptUrl = await uploadReceiptAndGetUrl(currentUser.uid, docRef.id, file);
-          await updateDoc(doc(db, "users", currentUser.uid, "transactions", docRef.id), { receiptUrl });
-        }
-
-        toast("Transaction saved.");
-        resetTxForm();
+        accountForm.reset();
+        accCurrency.value = "PKR";
+        toast("Account added.");
+      } catch (err) {
+        toast(err.message);
       }
-    } catch (err) {
-      toast(err.message);
-    } finally {
-      btnSaveTx.disabled = false;
-    }
-  });
-
-  async function uploadReceiptAndGetUrl(uid, txDocId, file) {
-    const safeName = file.name.replace(/[^\w.\-]+/g, "_");
-    const path = `users/${uid}/receipts/${txDocId}/${Date.now()}_${safeName}`;
-    const r = ref(storage, path);
-    await uploadBytes(r, file);
-    return await getDownloadURL(r);
-  }
-
-  function startEditTx(tx) {
-    txId.value = tx.id;
-    txType.value = tx.type;
-    txDate.value = tx.date;
-    txAmount.value = tx.amount;
-    txCurrency.value = tx.currency;
-    txPayment.value = tx.payment || "";
-    txRate.value = tx.exchangeRate ?? "";
-    txDept.value = tx.department || "";
-    txProject.value = tx.project || "";
-    txVendor.value = tx.vendor || "";
-    txRef.value = tx.reference || "";
-    txDescShort.value = tx.title || "";
-    txDesc.value = tx.notes || "";
-
-    // category
-    if (isKnownCategory(tx.category)) {
-      txCategory.value = tx.category;
-      handleOtherCategoryUI();
-    } else {
-      txCategory.value = "Other";
-      handleOtherCategoryUI();
-      txCategoryOther.value = tx.category || "";
-    }
-
-    // account
-    txAccount.value = tx.accountId;
-
-    modeBadge.innerHTML = `<span class="dot warn"></span><span>Edit Mode</span>`;
-    btnCancelEdit.disabled = false;
-
-    toast("Edit mode enabled.");
-  }
-
-  function isKnownCategory(cat) {
-    // match the dropdown options excluding "Other"
-    const known = [
-      "Rent","Electricity","Internet","Salaries","Transport","Food","Marketing",
-      "Operations","Taxes","Subscriptions","Maintenance"
-    ];
-    return known.includes(cat);
-  }
-
-  btnCancelEdit.addEventListener("click", () => resetTxForm());
-
-  function resetTxForm() {
-    txForm.reset();
-    txId.value = "";
-    txCurrency.value = "PKR";
-    handleOtherCategoryUI();
-    modeBadge.innerHTML = `<span class="dot primary"></span><span>Add Mode</span>`;
-    btnCancelEdit.disabled = true;
-    txReceipt.value = "";
-  }
-
-  async function deleteTx(txDocId) {
-    if (!currentUser) return;
-    try {
-      await deleteDoc(doc(db, "users", currentUser.uid, "transactions", txDocId));
-      toast("Transaction deleted.");
-    } catch (err) {
-      toast(err.message);
-    }
-  }
-
-
-  /***********************
-   * 12) FILTER + RENDER + STATS
-   ***********************/
-  const filterEls = [
-    filterType, filterCurrency, filterAccount, filterCategory, filterDepartment,
-    filterSearch, filterFrom, filterTo
-  ];
-  filterEls.forEach(el => el.addEventListener("input", recalcAndRender));
-  filterEls.forEach(el => el.addEventListener("change", recalcAndRender));
-
-  function getFilteredTransactions() {
-    const tType = filterType.value;
-    const cur = filterCurrency.value;
-    const acc = filterAccount.value;
-    const cat = filterCategory.value;
-    const dep = filterDepartment.value;
-    const search = normalizeText(filterSearch.value);
-
-    const fromD = parseDateInput(filterFrom.value);
-    const toD = parseDateInput(filterTo.value);
-
-    return transactions.filter(tx => {
-      if (tType !== "ALL" && tx.type !== tType) return false;
-      if (cur !== "ALL" && tx.currency !== cur) return false;
-      if (acc !== "ALL" && tx.accountId !== acc) return false;
-      if (cat !== "ALL") {
-        // filterCategory list includes "Other" but our saved category is the final text
-        // so: if user selects "Other", show transactions that are NOT known categories
-        if (cat === "Other") {
-          if (isKnownCategory(tx.category)) return false;
-        } else {
-          if (tx.category !== cat) return false;
-        }
-      }
-      if (dep !== "ALL" && tx.department !== dep) return false;
-
-      if (fromD || toD) {
-        const d = parseDateInput(tx.date);
-        if (!d) return false;
-        if (fromD && d < fromD) return false;
-        if (toD && d > toD) return false;
-      }
-
-      if (search) {
-        const hay = normalizeText([
-          tx.category, tx.department, tx.project, tx.vendor, tx.payment,
-          tx.reference, tx.title, tx.notes, tx.accountName
-        ].join(" "));
-        if (!hay.includes(search)) return false;
-      }
-
-      return true;
     });
-  }
 
-  function recalcAndRender() {
-    const filtered = getFilteredTransactions();
-    renderTransactions(filtered);
-    renderStats(filtered);
-    renderReserves(); // reserves are not filter-based (current reserves), but we show per currency
-  }
+    async function deleteAccount(accountId) {
+      if (!currentUser) return;
+      // Safety: prevent delete if there are transactions using it
+      const hasTx = transactions.some(t => t.accountId === accountId);
+      if (hasTx) return toast("Cannot delete. This account has transactions.");
 
-  function renderTransactions(list) {
-    txList.innerHTML = "";
-    countLabel.textContent = `${list.length} records`;
+      try {
+        await deleteDoc(doc(db, "users", currentUser.uid, "accounts", accountId));
+        toast("Account deleted.");
+      } catch (err) {
+        toast(err.message);
+      }
+    }
 
-    for (const tx of list) {
-      const tr = document.createElement("tr");
 
-      const amountClass = tx.type === "IN" ? "amount in" : "amount out";
-      const typeLabel = tx.type === "IN" ? "IN" : "OUT";
+    /***********************
+     * 11) TRANSACTIONS CRUD + RECEIPT UPLOAD
+     ***********************/
+    txForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) return toast("Please login first.");
 
-      const receiptLink = tx.receiptUrl
-        ? `<a href="${tx.receiptUrl}" target="_blank" rel="noopener">Receipt</a>`
-        : "";
+      handleOtherCategoryUI();
 
-      tr.innerHTML = `
+      // validate Other category text
+      if (txCategory.value === "Other" && !txCategoryOther.value.trim()) {
+        return toast("Please type the Other category.");
+      }
+
+      const dateStr = txDate.value;
+      const amount = Number(txAmount.value);
+      const currency = txCurrency.value;
+      const accountId = txAccount.value;
+
+      const account = accounts.find(a => a.id === accountId);
+      if (!account) return toast("Please select a valid account.");
+
+      // IMPORTANT: enforce account currency matches transaction currency
+      if (account.currency !== currency) {
+        return toast(`Currency mismatch. Account is ${account.currency} but transaction is ${currency}.`);
+      }
+
+      if (!dateStr) return toast("Date is required.");
+      if (Number.isNaN(amount) || amount <= 0) return toast("Amount must be greater than 0.");
+
+      const data = {
+        type: txType.value, // IN / OUT
+        date: dateStr,      // store as YYYY-MM-DD for easy filtering
+        amount,
+        currency,
+        accountId,
+        accountName: account.name, // denormalize for easy table display
+        category: txCategoryFinal(),
+        department: txDept.value,
+        project: txProject.value.trim(),
+        vendor: txVendor.value.trim(),
+        payment: txPayment.value,
+        reference: txRef.value.trim(),
+        title: txDescShort.value.trim(),
+        notes: txDesc.value.trim(),
+        exchangeRate: txRate.value ? Number(txRate.value) : null,
+        updatedAt: serverTimestamp()
+      };
+
+      // Receipt upload (optional)
+      const file = txReceipt.files && txReceipt.files[0] ? txReceipt.files[0] : null;
+
+      try {
+        btnSaveTx.disabled = true;
+
+        // If editing
+        if (txId.value) {
+          let receiptUrl = null;
+
+          if (file) {
+            receiptUrl = await uploadReceiptAndGetUrl(currentUser.uid, txId.value, file);
+          }
+
+          const patch = { ...data };
+          if (receiptUrl) patch.receiptUrl = receiptUrl;
+
+          await updateDoc(doc(db, "users", currentUser.uid, "transactions", txId.value), patch);
+          toast("Transaction updated.");
+          resetTxForm();
+        } else {
+          // Adding new
+          const docRef = await addDoc(txColRef(currentUser.uid), {
+            ...data,
+            createdAt: serverTimestamp()
+          });
+
+          if (file) {
+            const receiptUrl = await uploadReceiptAndGetUrl(currentUser.uid, docRef.id, file);
+            await updateDoc(doc(db, "users", currentUser.uid, "transactions", docRef.id), { receiptUrl });
+          }
+
+          toast("Transaction saved.");
+          resetTxForm();
+        }
+      } catch (err) {
+        toast(err.message);
+      } finally {
+        btnSaveTx.disabled = false;
+      }
+    });
+
+    async function uploadReceiptAndGetUrl(uid, txDocId, file) {
+      const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+      const path = `users/${uid}/receipts/${txDocId}/${Date.now()}_${safeName}`;
+      const r = ref(storage, path);
+      await uploadBytes(r, file);
+      return await getDownloadURL(r);
+    }
+
+    function startEditTx(tx) {
+      txId.value = tx.id;
+      txType.value = tx.type;
+      txDate.value = tx.date;
+      txAmount.value = tx.amount;
+      txCurrency.value = tx.currency;
+      txPayment.value = tx.payment || "";
+      txRate.value = tx.exchangeRate ?? "";
+      txDept.value = tx.department || "";
+      txProject.value = tx.project || "";
+      txVendor.value = tx.vendor || "";
+      txRef.value = tx.reference || "";
+      txDescShort.value = tx.title || "";
+      txDesc.value = tx.notes || "";
+
+      // category
+      if (isKnownCategory(tx.category)) {
+        txCategory.value = tx.category;
+        handleOtherCategoryUI();
+      } else {
+        txCategory.value = "Other";
+        handleOtherCategoryUI();
+        txCategoryOther.value = tx.category || "";
+      }
+
+      // account
+      txAccount.value = tx.accountId;
+
+      modeBadge.innerHTML = `<span class="dot warn"></span><span>Edit Mode</span>`;
+      btnCancelEdit.disabled = false;
+
+      toast("Edit mode enabled.");
+    }
+
+    function isKnownCategory(cat) {
+      // match the dropdown options excluding "Other"
+      const known = [
+        "Rent", "Electricity", "Internet", "Salaries", "Transport", "Food", "Marketing",
+        "Operations", "Taxes", "Subscriptions", "Maintenance"
+      ];
+      return known.includes(cat);
+    }
+
+    btnCancelEdit.addEventListener("click", () => resetTxForm());
+
+    function resetTxForm() {
+      txForm.reset();
+      txId.value = "";
+      txCurrency.value = "PKR";
+      handleOtherCategoryUI();
+      modeBadge.innerHTML = `<span class="dot primary"></span><span>Add Mode</span>`;
+      btnCancelEdit.disabled = true;
+      txReceipt.value = "";
+    }
+
+    async function deleteTx(txDocId) {
+      if (!currentUser) return;
+      try {
+        await deleteDoc(doc(db, "users", currentUser.uid, "transactions", txDocId));
+        toast("Transaction deleted.");
+      } catch (err) {
+        toast(err.message);
+      }
+    }
+
+
+    /***********************
+     * 12) FILTER + RENDER + STATS
+     ***********************/
+    const filterEls = [
+      filterType, filterCurrency, filterAccount, filterCategory, filterDepartment,
+      filterSearch, filterFrom, filterTo
+    ];
+    filterEls.forEach(el => el.addEventListener("input", recalcAndRender));
+    filterEls.forEach(el => el.addEventListener("change", recalcAndRender));
+
+    function getFilteredTransactions() {
+      const tType = filterType.value;
+      const cur = filterCurrency.value;
+      const acc = filterAccount.value;
+      const cat = filterCategory.value;
+      const dep = filterDepartment.value;
+      const search = normalizeText(filterSearch.value);
+
+      const fromD = parseDateInput(filterFrom.value);
+      const toD = parseDateInput(filterTo.value);
+
+      return transactions.filter(tx => {
+        if (tType !== "ALL" && tx.type !== tType) return false;
+        if (cur !== "ALL" && tx.currency !== cur) return false;
+        if (acc !== "ALL" && tx.accountId !== acc) return false;
+        if (cat !== "ALL") {
+          // filterCategory list includes "Other" but our saved category is the final text
+          // so: if user selects "Other", show transactions that are NOT known categories
+          if (cat === "Other") {
+            if (isKnownCategory(tx.category)) return false;
+          } else {
+            if (tx.category !== cat) return false;
+          }
+        }
+        if (dep !== "ALL" && tx.department !== dep) return false;
+
+        if (fromD || toD) {
+          const d = parseDateInput(tx.date);
+          if (!d) return false;
+          if (fromD && d < fromD) return false;
+          if (toD && d > toD) return false;
+        }
+
+        if (search) {
+          const hay = normalizeText([
+            tx.category, tx.department, tx.project, tx.vendor, tx.payment,
+            tx.reference, tx.title, tx.notes, tx.accountName
+          ].join(" "));
+          if (!hay.includes(search)) return false;
+        }
+
+        return true;
+      });
+    }
+
+    function recalcAndRender() {
+      const filtered = getFilteredTransactions();
+      renderTransactions(filtered);
+      renderStats(filtered);
+      renderReserves(); // reserves are not filter-based (current reserves), but we show per currency
+    }
+
+    function renderTransactions(list) {
+      txList.innerHTML = "";
+      countLabel.textContent = `${list.length} records`;
+
+      for (const tx of list) {
+        const tr = document.createElement("tr");
+
+        const amountClass = tx.type === "IN" ? "amount in" : "amount out";
+        const typeLabel = tx.type === "IN" ? "IN" : "OUT";
+
+        const receiptLink = tx.receiptUrl
+          ? `<a href="${tx.receiptUrl}" target="_blank" rel="noopener">Receipt</a>`
+          : "";
+
+        tr.innerHTML = `
         <td>${tx.date || ""}</td>
         <td>${typeLabel}</td>
         <td class="${amountClass}">${Number(tx.amount || 0).toFixed(2)}</td>
@@ -1522,266 +1670,267 @@ if (btnSignup) {
           </div>
         </td>
       `;
-      txList.appendChild(tr);
-    }
-  }
-
-  txList.addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-action]");
-    if (!btn) return;
-
-    const id = btn.dataset.id;
-    const action = btn.dataset.action;
-    const tx = transactions.find(t => t.id === id);
-    if (!tx) return;
-
-    if (action === "edit") startEditTx(tx);
-    if (action === "del") deleteTx(id);
-  });
-
-  function sumByCurrency(list, filterFn) {
-    const map = {}; // { PKR: 123, USD: 99 }
-    for (const tx of list) {
-      if (!filterFn(tx)) continue;
-      const c = tx.currency || "PKR";
-      map[c] = (map[c] || 0) + Number(tx.amount || 0);
-    }
-    return map;
-  }
-
-  function currencyMapToLines(map) {
-    const keys = Object.keys(map);
-    if (keys.length === 0) return "0";
-    return keys
-      .sort()
-      .map(k => `${k} ${map[k].toFixed(2)}`)
-      .join(" | ");
-  }
-
-  function renderStats(filteredList) {
-    const inMap = sumByCurrency(filteredList, tx => tx.type === "IN");
-    const outMap = sumByCurrency(filteredList, tx => tx.type === "OUT");
-
-    // net = in - out per currency
-    const netMap = {};
-    const allCur = new Set([...Object.keys(inMap), ...Object.keys(outMap)]);
-    for (const c of allCur) {
-      netMap[c] = (inMap[c] || 0) - (outMap[c] || 0);
+        txList.appendChild(tr);
+      }
     }
 
-    statCashIn.textContent = currencyMapToLines(inMap);
-    statCashOut.textContent = currencyMapToLines(outMap);
-    statNet.textContent = currencyMapToLines(netMap);
-  }
+    txList.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-action]");
+      if (!btn) return;
 
-  function renderReserves() {
-    // reserves per currency = sum over accounts of (opening + txIn - txOut)
-    const reserves = {}; // currency => total
+      const id = btn.dataset.id;
+      const action = btn.dataset.action;
+      const tx = transactions.find(t => t.id === id);
+      if (!tx) return;
 
-    for (const acc of accounts) {
-      const cur = acc.currency || "PKR";
-      const opening = Number(acc.openingBalance || 0);
+      if (action === "edit") startEditTx(tx);
+      if (action === "del") deleteTx(id);
+    });
 
-      let delta = 0;
-      for (const tx of transactions) {
-        if (tx.accountId !== acc.id) continue;
-        // currency already enforced match when saving
-        if (tx.type === "IN") delta += Number(tx.amount || 0);
-        else delta -= Number(tx.amount || 0);
+    function sumByCurrency(list, filterFn) {
+      const map = {}; // { PKR: 123, USD: 99 }
+      for (const tx of list) {
+        if (!filterFn(tx)) continue;
+        const c = tx.currency || "PKR";
+        map[c] = (map[c] || 0) + Number(tx.amount || 0);
+      }
+      return map;
+    }
+
+    function currencyMapToLines(map) {
+      const keys = Object.keys(map);
+      if (keys.length === 0) return "0";
+      return keys
+        .sort()
+        .map(k => `${k} ${map[k].toFixed(2)}`)
+        .join(" | ");
+    }
+
+    function renderStats(filteredList) {
+      const inMap = sumByCurrency(filteredList, tx => tx.type === "IN");
+      const outMap = sumByCurrency(filteredList, tx => tx.type === "OUT");
+
+      // net = in - out per currency
+      const netMap = {};
+      const allCur = new Set([...Object.keys(inMap), ...Object.keys(outMap)]);
+      for (const c of allCur) {
+        netMap[c] = (inMap[c] || 0) - (outMap[c] || 0);
       }
 
-      reserves[cur] = (reserves[cur] || 0) + (opening + delta);
+      statCashIn.textContent = currencyMapToLines(inMap);
+      statCashOut.textContent = currencyMapToLines(outMap);
+      statNet.textContent = currencyMapToLines(netMap);
     }
 
-    statReserves.textContent = currencyMapToLines(reserves);
+    function renderReserves() {
+      // reserves per currency = sum over accounts of (opening + txIn - txOut)
+      const reserves = {}; // currency => total
 
-    // also render current balance per account in accounts table
-    renderAccountsCurrentBalances();
-  }
+      for (const acc of accounts) {
+        const cur = acc.currency || "PKR";
+        const opening = Number(acc.openingBalance || 0);
+
+        let delta = 0;
+        for (const tx of transactions) {
+          if (tx.accountId !== acc.id) continue;
+          // currency already enforced match when saving
+          if (tx.type === "IN") delta += Number(tx.amount || 0);
+          else delta -= Number(tx.amount || 0);
+        }
+
+        reserves[cur] = (reserves[cur] || 0) + (opening + delta);
+      }
+
+      statReserves.textContent = currencyMapToLines(reserves);
+
+      // also render current balance per account in accounts table
+      renderAccountsCurrentBalances();
+    }
 
 
-  /***********************
-   * 13) RENDER ACCOUNTS + DROPDOWNS
-   ***********************/
-  function renderAccounts() {
-    accountsCount.textContent = `${accounts.length} accounts`;
-    accountsList.innerHTML = "";
+    /***********************
+     * 13) RENDER ACCOUNTS + DROPDOWNS
+     ***********************/
+    function renderAccounts() {
+      accountsCount.textContent = `${accounts.length} accounts`;
+      accountsList.innerHTML = "";
 
-    for (const acc of accounts) {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
+      for (const acc of accounts) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
         <td>${acc.name || ""}</td>
         <td>${acc.currency || ""}</td>
         <td>${Number(acc.openingBalance || 0).toFixed(2)}</td>
         <td data-acc-current="${acc.id}">...</td>
         <td><button class="link-btn del" data-acc-del="${acc.id}">Delete</button></td>
       `;
-      accountsList.appendChild(tr);
-    }
-
-    renderAccountsCurrentBalances();
-  }
-
-  function renderAccountsCurrentBalances() {
-    for (const acc of accounts) {
-      const cell = document.querySelector(`[data-acc-current="${acc.id}"]`);
-      if (!cell) continue;
-
-      const opening = Number(acc.openingBalance || 0);
-      let delta = 0;
-
-      for (const tx of transactions) {
-        if (tx.accountId !== acc.id) continue;
-        if (tx.type === "IN") delta += Number(tx.amount || 0);
-        else delta -= Number(tx.amount || 0);
+        accountsList.appendChild(tr);
       }
 
-      const current = opening + delta;
-      cell.textContent = current.toFixed(2);
-    }
-  }
-
-  accountsList.addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-acc-del]");
-    if (!btn) return;
-    const id = btn.dataset.accDel;
-    deleteAccount(id);
-  });
-
-  function refreshAccountDropdowns() {
-    // Transaction account dropdown
-    const selectedTxAcc = txAccount.value;
-    txAccount.innerHTML = `<option value="" disabled ${selectedTxAcc ? "" : "selected"}>Select Account</option>`;
-
-    // Filter account dropdown
-    const selectedFilterAcc = filterAccount.value;
-    filterAccount.innerHTML = `<option value="ALL">All Accounts</option>`;
-
-    for (const acc of accounts) {
-      const opt1 = document.createElement("option");
-      opt1.value = acc.id;
-      opt1.textContent = `${acc.name} (${acc.currency})`;
-      txAccount.appendChild(opt1);
-
-      const opt2 = document.createElement("option");
-      opt2.value = acc.id;
-      opt2.textContent = `${acc.name} (${acc.currency})`;
-      filterAccount.appendChild(opt2);
+      renderAccountsCurrentBalances();
     }
 
-    // restore selection if possible
-    if (selectedTxAcc) txAccount.value = selectedTxAcc;
-    if (selectedFilterAcc) filterAccount.value = selectedFilterAcc;
-  }
+    function renderAccountsCurrentBalances() {
+      for (const acc of accounts) {
+        const cell = document.querySelector(`[data-acc-current="${acc.id}"]`);
+        if (!cell) continue;
 
+        const opening = Number(acc.openingBalance || 0);
+        let delta = 0;
 
-  /***********************
-   * 14) CSV EXPORT
-   ***********************/
-  btnExportCsv.addEventListener("click", () => {
-    const list = getFilteredTransactions();
-    if (list.length === 0) return toast("No data to export.");
+        for (const tx of transactions) {
+          if (tx.accountId !== acc.id) continue;
+          if (tx.type === "IN") delta += Number(tx.amount || 0);
+          else delta -= Number(tx.amount || 0);
+        }
 
-    const headers = [
-      "date","type","amount","currency","accountName","category",
-      "department","project","vendor","payment","reference","title","notes","receiptUrl"
-    ];
-
-    const rows = [headers.join(",")];
-
-    for (const tx of list) {
-      const row = headers.map(h => {
-        const v = tx[h] ?? "";
-        const s = String(v).replaceAll('"', '""');
-        return `"${s}"`;
-      }).join(",");
-      rows.push(row);
+        const current = opening + delta;
+        cell.textContent = current.toFixed(2);
+      }
     }
 
-    const csv = rows.join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
+    accountsList.addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-acc-del]");
+      if (!btn) return;
+      const id = btn.dataset.accDel;
+      deleteAccount(id);
+    });
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `transactions_${new Date().toISOString().slice(0,10)}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
+    function refreshAccountDropdowns() {
+      // Transaction account dropdown
+      const selectedTxAcc = txAccount.value;
+      txAccount.innerHTML = `<option value="" disabled ${selectedTxAcc ? "" : "selected"}>Select Account</option>`;
 
-    URL.revokeObjectURL(url);
-    toast("CSV exported.");
-  });
+      // Filter account dropdown
+      const selectedFilterAcc = filterAccount.value;
+      filterAccount.innerHTML = `<option value="ALL">All Accounts</option>`;
+
+      for (const acc of accounts) {
+        const opt1 = document.createElement("option");
+        opt1.value = acc.id;
+        opt1.textContent = `${acc.name} (${acc.currency})`;
+        txAccount.appendChild(opt1);
+
+        const opt2 = document.createElement("option");
+        opt2.value = acc.id;
+        opt2.textContent = `${acc.name} (${acc.currency})`;
+        filterAccount.appendChild(opt2);
+      }
+
+      // restore selection if possible
+      if (selectedTxAcc) txAccount.value = selectedTxAcc;
+      if (selectedFilterAcc) filterAccount.value = selectedFilterAcc;
+    }
 
 
-  /***********************
-   * 15) REFRESH + CLEAR ALL
-   ***********************/
-  btnRefresh.addEventListener("click", () => {
-    toast("Live sync is enabled. Data is already up to date.");
-  });
+    /***********************
+     * 14) CSV EXPORT
+     ***********************/
+    btnExportCsv.addEventListener("click", () => {
+      const list = getFilteredTransactions();
+      if (list.length === 0) return toast("No data to export.");
 
-  btnClearAll.addEventListener("click", async () => {
-    if (!currentUser) return;
-    // WARNING: This clears all accounts/transactions for this user
-    const ok = confirm("This will delete ALL your accounts and transactions. Continue?");
-    if (!ok) return;
+      const headers = [
+        "date", "type", "amount", "currency", "accountName", "category",
+        "department", "project", "vendor", "payment", "reference", "title", "notes", "receiptUrl"
+      ];
 
-    try {
-      // delete transactions
-      const txSnap = await getDocs(txColRef(currentUser.uid));
-      for (const d of txSnap.docs) await deleteDoc(d.ref);
+      const rows = [headers.join(",")];
 
-      // delete accounts
-      const accSnap = await getDocs(accountsColRef(currentUser.uid));
-      for (const d of accSnap.docs) await deleteDoc(d.ref);
+      for (const tx of list) {
+        const row = headers.map(h => {
+          const v = tx[h] ?? "";
+          const s = String(v).replaceAll('"', '""');
+          return `"${s}"`;
+        }).join(",");
+        rows.push(row);
+      }
 
-      toast("All data cleared.");
+      const csv = rows.join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `transactions_${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      URL.revokeObjectURL(url);
+      toast("CSV exported.");
+    });
+
+
+    /***********************
+     * 15) REFRESH + CLEAR ALL
+     ***********************/
+    btnRefresh.addEventListener("click", () => {
+      toast("Live sync is enabled. Data is already up to date.");
+    });
+
+    btnClearAll.addEventListener("click", async () => {
+      if (!currentUser) return;
+      // WARNING: This clears all accounts/transactions for this user
+      const ok = confirm("This will delete ALL your accounts and transactions. Continue?");
+      if (!ok) return;
+
+      try {
+        // delete transactions
+        const txSnap = await getDocs(txColRef(currentUser.uid));
+        for (const d of txSnap.docs) await deleteDoc(d.ref);
+
+        // delete accounts
+        const accSnap = await getDocs(accountsColRef(currentUser.uid));
+        for (const d of accSnap.docs) await deleteDoc(d.ref);
+
+        toast("All data cleared.");
+        resetTxForm();
+      } catch (err) {
+        toast(err.message);
+      }
+    });
+
+
+    /***********************
+     * 16) DEFAULT DATES + INIT UI
+     ***********************/
+    function setDefaultDates() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+
+      if (filterTo) filterTo.value = `${yyyy}-${mm}-${dd}`;
+      if (filterFrom) filterFrom.value = `${yyyy}-${mm}-01`;
+      if (txDate) txDate.value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    function clearUI() {
+      // Clear tables + stats
+      accountsList.innerHTML = "";
+      txList.innerHTML = "";
+      accountsCount.textContent = "0 accounts";
+      countLabel.textContent = "0 records";
+
+      statCashIn.textContent = "0";
+      statCashOut.textContent = "0";
+      statNet.textContent = "0";
+      statReserves.textContent = "0";
+
+      // Clear dropdowns
+      filterAccount.innerHTML = `<option value="ALL">All Accounts</option>`;
+      txAccount.innerHTML = `<option value="" disabled selected>Select Account</option>`;
+
       resetTxForm();
-    } catch (err) {
-      toast(err.message);
     }
-  });
 
-
-  /***********************
-   * 16) DEFAULT DATES + INIT UI
-   ***********************/
-  function setDefaultDates() {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-
-    if (filterTo) filterTo.value = `${yyyy}-${mm}-${dd}`;
-    if (filterFrom) filterFrom.value = `${yyyy}-${mm}-01`;
-    if (txDate) txDate.value = `${yyyy}-${mm}-${dd}`;
-  }
-
-  function clearUI() {
-    // Clear tables + stats
-    accountsList.innerHTML = "";
-    txList.innerHTML = "";
-    accountsCount.textContent = "0 accounts";
-    countLabel.textContent = "0 records";
-
-    statCashIn.textContent = "0";
-    statCashOut.textContent = "0";
-    statNet.textContent = "0";
-    statReserves.textContent = "0";
-
-    // Clear dropdowns
-    filterAccount.innerHTML = `<option value="ALL">All Accounts</option>`;
-    txAccount.innerHTML = `<option value="" disabled selected>Select Account</option>`;
-
-    resetTxForm();
-  }
-
-  setDefaultDates();
-  handleOtherCategoryUI();
-  showLogin();
-  toast("Firebase-ready. Add your config to start.");
-</script>
+    setDefaultDates();
+    handleOtherCategoryUI();
+    showLogin();
+    toast("Firebase-ready. Add your config to start.");
+  </script>
 
 </body>
+
 </html>
