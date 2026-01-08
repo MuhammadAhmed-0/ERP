@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empire Digisiol - Salary Invoice Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .form-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .form-section h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 24px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .dynamic-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .dynamic-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-add {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #059669;
+        }
+
+        .btn-remove {
+            background: #ef4444;
+            color: white;
+            padding: 12px;
+        }
+
+        .btn-remove:hover {
+            background: #dc2626;
+        }
+
+        .btn-generate {
+            background: #667eea;
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 16px;
+        }
+
+        .btn-generate:hover {
+            background: #5568d3;
+        }
+
+        .btn-print {
+            background: #8b5cf6;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .btn-print:hover {
+            background: #7c3aed;
+        }
+
+        .invoice-section {
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        .invoice-header h1 {
+            color: #667eea;
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+
+        .invoice-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .invoice-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .salary-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .salary-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .amount {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .total-row {
+            background: #f8f9fa;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .total-row td {
+            padding: 20px 15px;
+            border-top: 3px solid #667eea;
+        }
+
+        .net-salary {
+            background: #667eea;
+            color: white;
+            font-size: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            color: #666;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .form-section, .btn-print {
+                display: none !important;
+            }
+
+            .invoice-section {
+                box-shadow: none;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-section">
+            <h2>Salary Invoice Generator - Empire Digisiol</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Employee Name</label>
+                    <input type="text" id="empName" placeholder="Enter employee name">
+                </div>
+                <div class="form-group">
+                    <label>Employee ID</label>
+                    <input type="text" id="empId" placeholder="Enter employee ID">
+                </div>
+                <div class="form-group">
+                    <label>Designation</label>
+                    <input type="text" id="designation" placeholder="Enter designation">
+                </div>
+                <div class="form-group">
+                    <label>Department</label>
+                    <input type="text" id="department" placeholder="Enter department">
+                </div>
+                <div class="form-group">
+                    <label>Invoice Month</label>
+                    <input type="month" id="invoiceMonth">
+                </div>
+                <div class="form-group">
+                    <label>Basic Salary</label>
+                    <input type="number" id="basicSalary" placeholder="Enter basic salary" value="0">
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Total Working Days</label>
+                    <input type="number" id="workingDays" placeholder="Enter working days" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Leave Days Taken</label>
+                    <input type="number" id="leaveDays" placeholder="Enter leave days" value="0">
+                </div>
+            </div>
+
+            <div class="dynamic-section">
+                <h3 style="margin-bottom: 15px; color: #667eea;">Deductions</h3>
+                <div id="deductionsContainer"></div>
+                <button class="btn btn-add" onclick="addDeduction()">+ Add Deduction</button>
+            </div>
+
+            <div class="dynamic-section">
+                <h3 style="margin-bottom: 15px; color: #667eea;">Other Payments/Allowances</h3>
+                <div id="paymentsContainer"></div>
+                <button class="btn btn-add" onclick="addPayment()">+ Add Payment</button>
+            </div>
+
+            <button class="btn btn-generate" onclick="generateInvoice()">Generate Invoice</button>
+        </div>
+
+        <div class="invoice-section" id="invoiceSection">
+            <div class="invoice-header">
+                <h1>EMPIRE DIGISIOL</h1>
+                <p>Salary Invoice</p>
+            </div>
+
+            <div class="invoice-info">
+                <div class="info-box">
+                    <h3>Employee Details</h3>
+                    <div class="info-row">
+                        <span class="info-label">Name:</span>
+                        <span id="inv-name"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Employee ID:</span>
+                        <span id="inv-id"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Designation:</span>
+                        <span id="inv-designation"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Department:</span>
+                        <span id="inv-department"></span>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h3>Invoice Details</h3>
+                    <div class="info-row">
+                        <span class="info-label">Invoice Month:</span>
+                        <span id="inv-month"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Working Days:</span>
+                        <span id="inv-working"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Leave Days:</span>
+                        <span id="inv-leave"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Issue Date:</span>
+                        <span id="inv-date"></span>
+                    </div>
+                </div>
+            </div>
+
+            <table class="salary-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th class="amount">Amount (PKR)</th>
+                    </tr>
+                </thead>
+                <tbody id="salaryTableBody"></tbody>
+            </table>
+
+            <div class="footer">
+                <p><strong>Empire Digisiol</strong></p>
+                <p>This is a computer-generated invoice</p>
+            </div>
+
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button class="btn btn-print" onclick="window.print()" style="flex: 1;">🖨️ Print Invoice</button>
+                <button class="btn btn-print" onclick="downloadAsPNG()" style="flex: 1; background: #10b981;">📥 Download as PNG</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        let deductionCount = 0;
+        let paymentCount = 0;
+
+        function addDeduction() {
+            deductionCount++;
+            const container = document.getElementById('deductionsContainer');
+            const div = document.createElement('div');
+            div.className = 'dynamic-item';
+            div.id = `deduction-${deductionCount}`;
+            div.innerHTML = `
+                <div class="form-group">
+                    <label>Deduction Name</label>
+                    <input type="text" placeholder="e.g., Tax, Advance" class="ded-name">
+                </div>
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input type="number" placeholder="Enter amount" class="ded-amount" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Reason</label>
+                    <input type="text" placeholder="Enter reason" class="ded-reason">
+                </div>
+                <button class="btn btn-remove" onclick="removeItem('deduction-${deductionCount}')">✕</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function addPayment() {
+            paymentCount++;
+            const container = document.getElementById('paymentsContainer');
+            const div = document.createElement('div');
+            div.className = 'dynamic-item';
+            div.id = `payment-${paymentCount}`;
+            div.innerHTML = `
+                <div class="form-group">
+                    <label>Payment Name</label>
+                    <input type="text" placeholder="e.g., Bonus, Allowance" class="pay-name">
+                </div>
+                <div class="form-group">
+                    <label>Amount</label>
+                    <input type="number" placeholder="Enter amount" class="pay-amount" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" placeholder="Enter description" class="pay-desc">
+                </div>
+                <button class="btn btn-remove" onclick="removeItem('payment-${paymentCount}')">✕</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeItem(id) {
+            document.getElementById(id).remove();
+        }
+
+        function generateInvoice() {
+            const empName = document.getElementById('empName').value;
+            const empId = document.getElementById('empId').value;
+            const designation = document.getElementById('designation').value;
+            const department = document.getElementById('department').value;
+            const invoiceMonth = document.getElementById('invoiceMonth').value;
+            const basicSalary = parseFloat(document.getElementById('basicSalary').value) || 0;
+            const workingDays = parseInt(document.getElementById('workingDays').value) || 0;
+            const leaveDays = parseInt(document.getElementById('leaveDays').value) || 0;
+
+            if (!empName || !empId || !invoiceMonth) {
+                alert('Please fill in all required fields (Employee Name, ID, and Invoice Month)');
+                return;
+            }
+
+            document.getElementById('inv-name').textContent = empName;
+            document.getElementById('inv-id').textContent = empId;
+            document.getElementById('inv-designation').textContent = designation;
+            document.getElementById('inv-department').textContent = department;
+            document.getElementById('inv-month').textContent = new Date(invoiceMonth).toLocaleDateString('en-US', {year: 'numeric', month: 'long'});
+            document.getElementById('inv-working').textContent = workingDays;
+            document.getElementById('inv-leave').textContent = leaveDays;
+            document.getElementById('inv-date').textContent = new Date().toLocaleDateString();
+
+            const tbody = document.getElementById('salaryTableBody');
+            tbody.innerHTML = '';
+
+            let totalEarnings = basicSalary;
+            let totalDeductions = 0;
+
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>Basic Salary</strong></td>
+                    <td class="amount">${basicSalary.toFixed(2)}</td>
+                </tr>
+            `;
+
+            const payments = document.querySelectorAll('#paymentsContainer .dynamic-item');
+            payments.forEach(item => {
+                const name = item.querySelector('.pay-name').value;
+                const amount = parseFloat(item.querySelector('.pay-amount').value) || 0;
+                const desc = item.querySelector('.pay-desc').value;
+                
+                if (name && amount > 0) {
+                    totalEarnings += amount;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${name}${desc ? ` (${desc})` : ''}</td>
+                            <td class="amount">${amount.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            tbody.innerHTML += `
+                <tr class="total-row">
+                    <td><strong>Total Earnings</strong></td>
+                    <td class="amount">${totalEarnings.toFixed(2)}</td>
+                </tr>
+            `;
+
+            if (leaveDays > 0 && workingDays > 0) {
+                const leaveDeduction = (basicSalary / workingDays) * leaveDays;
+                totalDeductions += leaveDeduction;
+                tbody.innerHTML += `
+                    <tr style="background: #fff5f5;">
+                        <td>Leave Deduction (${leaveDays} days)</td>
+                        <td class="amount" style="color: #ef4444;">-${leaveDeduction.toFixed(2)}</td>
+                    </tr>
+                `;
+            }
+
+            const deductions = document.querySelectorAll('#deductionsContainer .dynamic-item');
+            deductions.forEach(item => {
+                const name = item.querySelector('.ded-name').value;
+                const amount = parseFloat(item.querySelector('.ded-amount').value) || 0;
+                const reason = item.querySelector('.ded-reason').value;
+                
+                if (name && amount > 0) {
+                    totalDeductions += amount;
+                    tbody.innerHTML += `
+                        <tr style="background: #fff5f5;">
+                            <td>${name}${reason ? ` (${reason})` : ''}</td>
+                            <td class="amount" style="color: #ef4444;">-${amount.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if (totalDeductions > 0) {
+                tbody.innerHTML += `
+                    <tr class="total-row">
+                        <td><strong>Total Deductions</strong></td>
+                        <td class="amount" style="color: #ef4444;">-${totalDeductions.toFixed(2)}</td>
+                    </tr>
+                `;
+            }
+
+            const netSalary = totalEarnings - totalDeductions;
+            tbody.innerHTML += `
+                <tr class="net-salary">
+                    <td><strong>NET SALARY</strong></td>
+                    <td class="amount"><strong>${netSalary.toFixed(2)}</strong></td>
+                </tr>
+            `;
+
+            document.getElementById('invoiceSection').style.display = 'block';
+            document.getElementById('invoiceSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        addDeduction();
+        addPayment();
+
+        async function downloadAsPNG() {
+            const invoiceSection = document.getElementById('invoiceSection');
+            const buttons = invoiceSection.querySelectorAll('.btn-print');
+            
+            // Hide buttons temporarily
+            buttons.forEach(btn => btn.style.display = 'none');
+            
+            try {
+                const canvas = await html2canvas(invoiceSection, {
+                    scale: 2,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    windowWidth: 1200
+                });
+                
+                // Create download link
+                const link = document.createElement('a');
+                const empName = document.getElementById('empName').value.replace(/\s+/g, '_');
+                const month = document.getElementById('invoiceMonth').value;
+                link.download = `Salary_Invoice_${empName}_${month}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } catch (error) {
+                alert('Error generating PNG. Please try again.');
+                console.error(error);
+            } finally {
+                // Show buttons again
+                buttons.forEach(btn => btn.style.display = 'block');
+            }
+        }
+    </script>
+</body>
+</html>
